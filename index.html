@@ -57,7 +57,14 @@
       <input id="masterCodeInput" type="password" inputmode="numeric" placeholder="0000">
       <div class="row"><button class="danger" id="forceDeleteRoomBtn">このルームを強制削除</button></div>
     </div>
-    <div class="row"><button class="ghost" id="leaveRoomBtn">退出</button></div><p class="small-note" style="color:#8b7468;font-size:12px;line-height:1.5">※ホストが退出するとルームは削除されます。参加者の退出では削除されません。</p>
+    <div class="panel" id="adminPanel">
+      <h3>管理操作</h3>
+      <p>ルームが残ってしまった場合は、マスターコードで強制削除できます。</p>
+      <label for="masterCodeInput">マスターコード</label>
+      <input id="masterCodeInput" type="password" inputmode="numeric" placeholder="0000">
+      <div class="row"><button class="danger" id="forceDeleteRoomBtn">このルームを強制削除</button></div>
+    </div>
+    <div class="row"><button class="ghost" id="leaveRoomBtn">退出</button></div>>※ホストが退出するとルームは削除されます。参加者の退出では削除されません。</p>
     <div id="roomMessage"></div>
   </section>
 
@@ -92,12 +99,12 @@ let roomListUnsub = null;
 let localIsHost = false;
 const MASTER_CODE = '0000';
 
-const $ = id => document.getElementById(id);
+const $ = id => doculet localIsHost = false;
+const MASTER_CODE = '0000';
 const show = name => ['setupScreen','roomScreen','lockedScreen'].forEach(id => $(id).classList.toggle('active', id === name));
 const msg = (id, text, type='notice') => { $(id).innerHTML = text ? `<div class="notice ${type}">${text}</div>` : ''; };
 const getPlayerName = () => $('playerName').value.trim();
-function requirePlayerName(){
-  if(!getPlayerName()){
+function requirePlayerNme()){
     alert('プレイヤー名を入力してください');
     $('playerName').focus();
     return false;
@@ -237,6 +244,8 @@ function listenPlayers(roomId){
 
 async function startRoom(){
   if(!currentRoomId || !localIsHost) return;
+  await updateDoc(doc(db,async function startRoom(){
+  if(!currentRoomId || !localIsHost) return;
   await updateDoc(doc(db,'rooms',currentRoomId),{
     status:'started',
     lockedJoin:true,
@@ -244,9 +253,28 @@ async function startRoom(){
   });
 }
 
-async function deleteCurrentRoom(message='ルームを一覧から削除しました。'){
+async function deleteRoomByStatus(message='ルームを削除しました。'){
   if(!currentRoomId) return;
   await updateDoc(doc(db,'rooms',currentRoomId),{
+    status:'deleted',
+    lockedJoin:true,
+    updatedAt:serverTimestamp()
+  });
+  msg('roomMessage',message,'ok');
+}
+
+async function forceDeleteRoom(){
+  if(!currentRoomId) return;
+  const input = $('masterCodeInput');
+  const code = input ? input.value.trim() : '';
+  if(code !== MASTER_CODE){
+    alert('マスターコードが違います');
+    if(input) input.focus();
+    return;
+  }
+  if(!confirm('このルームを強制削除します。よろしいですか？')) return;
+  await deleteRoomByStatus('マスターコードによりルームを強制削除しました。');
+}t updateDoc(doc(db,'rooms',currentRoomId),{
     status:'deleted',
     lockedJoin:true,
     updatedAt:serverTimestamp()
@@ -310,7 +338,8 @@ $('forceDeleteRoomBtn').onclick = forceDeleteRoom;
 $('leaveRoomBtn').onclick = leaveRoom;
 $('backHomeBtn').onclick = () => show('setupScreen');
 
-initFirebase().catch(e => msg('setupMessage','Firebase初期化エラー：'+escapeHtml(e.message),'error'));
+init$('leaveRoomBtn').onclick = leaveRoom;
+if($('forceDeleteRoomBtn')) $('forceDeleteRoomBtn').onclick = forceDeleteRoom;e','Firebase初期化エラー：'+escapeHtml(e.message),'error'));
 </script>
 </body>
 </html>

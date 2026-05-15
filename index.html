@@ -80,6 +80,21 @@
     <div id="playMessage"></div>
   </section>
 
+  <section id="onlineResultScreen" class="screen">
+    <div class="hero"><h2>結果発表</h2><p>ペア判定とじゃんけん結果を表示します。</p></div>
+    <div class="panel">
+      <h3 id="onlineWinnerTitle">結果</h3>
+      <div id="onlineResultBox"></div>
+    </div>
+    <div class="panel">
+      <h3>公開結果</h3>
+      <div id="onlineResultList" class="players"></div>
+    </div>
+    <div class="panel">
+      <div class="row"><button class="ghost" id="onlineBackRoomBtn">待機画面へ戻る</button></div>
+    </div>
+  </section>
+
   <section id="lockedScreen" class="screen">
     <div class="hero"><h2>このルームには参加できません</h2><p>すでにゲーム開始済み、または削除済みです。</p></div>
     <div class="panel"><button class="main" id="backHomeBtn">最初に戻る</button></div>
@@ -114,7 +129,7 @@ const clientId = sessionStorage.getItem('ogoriClientId') || ('client_' + Date.no
 sessionStorage.setItem('ogoriClientId', clientId);
 
 const $ = id => document.getElementById(id);
-const show = name => ['setupScreen','roomScreen','playScreen','lockedScreen'].forEach(id => $(id).classList.toggle('active', id === name));
+const show = name => ['setupScreen','roomScreen','playScreen','onlineResultScreen','lockedScreen'].forEach(id => $(id).classList.toggle('active', id === name));
 const msg = (id, text, type='notice') => { $(id).innerHTML = text ? `<div class="notice ${type}">${text}</div>` : ''; };
 const getPlayerName = () => $('playerName').value.trim();
 const safeRoomName = () => $('roomNameInput').value.trim() || 'おごりの鬼ルーム';
@@ -132,6 +147,31 @@ function card(name,type){return{id:name+'-'+type+'-'+Math.random().toString(36).
 function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
 function rareSet(n){if(n<=5)return['キング'];if(n<=8)return['キング','クイーン'];if(n<=10)return['キング','クイーン','エンジェル'];return rareNames;}
 function makeDeck(n){const total=n*2,rares=rareSet(n),deck=[card('鬼','鬼'),card('鬼','鬼')];rares.forEach(name=>deck.push(card(name,'レア'),card(name,'レア')));const maxNames=Math.max(1,n-1),names=[{name:'鬼',type:'鬼'},...rares.map(name=>({name,type:'レア'}))];let i=0;while(names.length<maxNames){names.push({name:regularNames[i++%regularNames.length],type:'通常'});}const regs=names.filter(x=>x.type==='通常');i=0;while(deck.length<total){const e=regs[i++%regs.length];deck.push(card(e.name,e.type));}return shuffle(deck);}
+function dealHandsWithoutDoubleOni(playerCount){
+  for(let attempt=0; attempt<80; attempt++){
+    const deck=makeDeck(playerCount);
+    const hands=[];
+    let ok=true;
+    for(let i=0;i<playerCount;i++){
+      const pair=[deck[i*2],deck[i*2+1]];
+      if(pair[0].name==='鬼' && pair[1].name==='鬼'){ok=false;break;}
+      hands.push(pair);
+    }
+    if(ok) return hands;
+  }
+  const deck=makeDeck(playerCount);
+  const oni=deck.filter(c=>c.name==='鬼');
+  const others=deck.filter(c=>c.name!=='鬼');
+  const hands=Array.from({length:playerCount},()=>[]);
+  oni.forEach((c,i)=>hands[i].push(c));
+  let index=0;
+  for(const c of others){
+    while(hands[index%playerCount].length>=2) index++;
+    hands[index%playerCount].push(c);
+    index++;
+  }
+  return hands.map(h=>h.length===2?h:[...h,others.pop()].slice(0,2));
+}
 const roomAgeMs = room => room.createdAt?.toMillis ? Date.now() - room.createdAt.toMillis() : 0;
 const isVisibleWaitingRoom = room => room.status === 'waiting' && !room.lockedJoin && roomAgeMs(room) <= ROOM_VISIBLE_MS;
 
@@ -252,6 +292,12 @@ function listenRoom(roomId){
       show('playScreen');
       renderOnlinePlay();
     }
+    if(room.status === 'result') {
+      $('statusPill').textContent = '結果公開';
+      currentRoomData = room;
+      show('onlineResultScreen');
+      renderOnlineResult();
+    }
     if(room.status === 'started') {
       $('statusPill').textContent = '開始済み';
       $('startRoomBtn').disabled = true;
@@ -285,11 +331,11 @@ async function startRoom(){
     alert('4人以上で開始してください');
     return;
   }
-  const deck = makeDeck(players.length);
+  const dealtHands = dealHandsWithoutDoubleOni(players.length);
   const batch = writeBatch(db);
   players.forEach((p,i)=>{
     batch.update(doc(db,'rooms',currentRoomId,'players',p.clientId),{
-      handCards:[deck[i*2],deck[i*2+1]],
+      handCards:dealtHands[i],
       selectedCardId:null,
       selectedHand:null,
       locked:false,
@@ -346,8 +392,62 @@ async function lockChoice(){
   });
 }
 
+function groupByValue(array,fn){return array.reduce((acc,item)=>{const key=fn(item);if(!acc[key])acc[key]=[];acc[key].push(item);return acc;},{});}
+function losingHand(a,b){const pair=[a,b].sort().join('|');if(pair==='rock|scissors')return'scissors';if(pair==='paper|scissors')return'paper';if(pair==='paper|rock')return'rock';return a;}
+function judgeOnlineRps(players){
+  const unique=[...new Set(players.map(p=>p.selectedHand))];
+  if(players.length===1)return{status:'decided',winner:players[0],note:'対象者が1名のため決定'};
+  if(unique.length===1||unique.length===3)return{status:'tie',note:'じゃんけんによる勝敗がつきませんでした'};
+  const lose=losingHand(unique[0],unique[1]);
+  const losers=players.filter(p=>p.selectedHand===lose);
+  if(losers.length===1)return{status:'decided',winner:losers[0],note:'じゃんけんで決定'};
+  return{status:'tie',note:'負け手が複数名のため再戦が必要です'};
+}
 async function hostReveal(){
-  alert('次の段階で、ペア判定・結果表示を接続します。');
+  if(!currentRoomId||!localIsHost)return;
+  const playersSnap=await getDocs(collection(db,'rooms',currentRoomId,'players'));
+  const players=[];
+  playersSnap.forEach(d=>players.push(d.data()));
+  if(players.some(p=>!p.locked)){
+    alert('全員がロックするまで公開できません');
+    return;
+  }
+  const selected=players.map(p=>({
+    clientId:p.clientId,
+    name:p.name,
+    selectedHand:p.selectedHand,
+    selectedCard:(p.handCards||[]).find(c=>c.id===p.selectedCardId)
+  }));
+  const groups=groupByValue(selected,p=>p.selectedCard?.name||'未選択');
+  const pairGroups=Object.values(groups).filter(g=>g.length>=2);
+  const safePlayers=selected.filter(p=>(groups[p.selectedCard?.name||'未選択']||[]).length===1);
+  let result={pairGroups:pairGroups.map(g=>({cardName:g[0].selectedCard.name,players:g.map(p=>p.name)})),safePlayers:safePlayers.map(p=>p.name),targetCardName:null,targetPlayers:[],winnerName:null,note:''};
+  if(pairGroups.length){
+    const target=pairGroups[Math.floor(Math.random()*pairGroups.length)];
+    const judge=judgeOnlineRps(target);
+    result.targetCardName=target[0].selectedCard.name;
+    result.targetPlayers=target.map(p=>({name:p.name,hand:p.selectedHand}));
+    result.winnerName=judge.status==='decided'?judge.winner.name:null;
+    result.note=judge.note;
+  }else{
+    result.note='ペアが成立しなかったため全員セーフです';
+  }
+  await updateDoc(doc(db,'rooms',currentRoomId),{
+    status:'result',
+    result,
+    updatedAt:serverTimestamp()
+  });
+}
+function handLabel(key){const h=hands.find(x=>x.key===key);return h?`${h.emoji} ${h.label}`:'?';}
+function renderOnlineResult(){
+  const result=currentRoomData?.result;
+  if(!result)return;
+  $('onlineWinnerTitle').textContent=result.winnerName?'おごりの鬼':'結果';
+  $('onlineResultBox').innerHTML=result.winnerName?`<div class="room-name-big">${escapeHtml(result.winnerName)}</div><p>対象カード：${escapeHtml(result.targetCardName||'')}</p><p>${escapeHtml(result.note||'')}</p>`:`<div class="room-name-big">再戦</div><p>${escapeHtml(result.note||'')}</p>`;
+  const pairs=(result.pairGroups||[]).map(g=>`<div class="player"><b>${escapeHtml(g.cardName)}</b><span class="tag">${g.players.map(escapeHtml).join('、')}</span></div>`).join('');
+  const targets=(result.targetPlayers||[]).map(p=>`<div class="player"><b>${escapeHtml(p.name)}</b><span class="tag host">${handLabel(p.hand)}</span></div>`).join('');
+  const safe=(result.safePlayers||[]).map(n=>`<div class="player"><b>${escapeHtml(n)}</b><span class="tag">セーフ</span></div>`).join('');
+  $('onlineResultList').innerHTML=(pairs?`<h3>ペア成立</h3>${pairs}`:'')+(targets?`<h3>対象者</h3>${targets}`:'')+(safe?`<h3>セーフ</h3>${safe}`:'');
 }
 
 async function deleteCurrentRoom(message='ルームを削除しました。'){
@@ -413,6 +513,7 @@ $('startRoomBtn').onclick = startRoom;
 $('abortRoomBtn').onclick = abortRoom;
 $('lockChoiceBtn').onclick = lockChoice;
 $('hostRevealBtn').onclick = hostReveal;
+$('onlineBackRoomBtn').onclick = () => show('roomScreen');
 $('forceDeleteRoomBtn').onclick = forceDeleteRoom;
 $('leaveRoomBtn').onclick = leaveRoom;
 $('backHomeBtn').onclick = () => show('setupScreen');

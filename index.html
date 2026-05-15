@@ -50,6 +50,13 @@
       <div class="row"><button class="main" id="startRoomBtn">ゲーム開始</button><button class="danger" id="abortRoomBtn">ルームを削除</button></div>
     </div>
     <div class="panel hidden" id="guestPanel"><h3>待機中</h3><p>ホストがゲームを開始するまで待ってください。</p></div>
+    <div class="panel">
+      <h3>管理操作</h3>
+      <p>ルームが残ってしまった場合は、マスターコードで強制削除できます。</p>
+      <label for="masterCodeInput">マスターコード</label>
+      <input id="masterCodeInput" type="password" inputmode="numeric" placeholder="0000">
+      <div class="row"><button class="danger" id="forceDeleteRoomBtn">このルームを強制削除</button></div>
+    </div>
     <div class="row"><button class="ghost" id="leaveRoomBtn">退出</button></div><p class="small-note" style="color:#8b7468;font-size:12px;line-height:1.5">※ホストが退出するとルームは削除されます。参加者の退出では削除されません。</p>
     <div id="roomMessage"></div>
   </section>
@@ -83,6 +90,7 @@ let roomUnsub = null;
 let playersUnsub = null;
 let roomListUnsub = null;
 let localIsHost = false;
+const MASTER_CODE = '0000';
 
 const $ = id => document.getElementById(id);
 const show = name => ['setupScreen','roomScreen','lockedScreen'].forEach(id => $(id).classList.toggle('active', id === name));
@@ -236,14 +244,31 @@ async function startRoom(){
   });
 }
 
-async function abortRoom(){
-  if(!currentRoomId || !localIsHost) return;
+async function deleteCurrentRoom(message='ルームを一覧から削除しました。'){
+  if(!currentRoomId) return;
   await updateDoc(doc(db,'rooms',currentRoomId),{
     status:'deleted',
     lockedJoin:true,
     updatedAt:serverTimestamp()
   });
-  msg('roomMessage','ルームを一覧から削除しました。','ok');
+  msg('roomMessage',message,'ok');
+}
+
+async function abortRoom(){
+  if(!currentRoomId || !localIsHost) return;
+  await deleteCurrentRoom('ルームを一覧から削除しました。');
+}
+
+async function forceDeleteRoom(){
+  if(!currentRoomId) return;
+  const code = $('masterCodeInput').value.trim();
+  if(code !== MASTER_CODE){
+    alert('マスターコードが違います');
+    $('masterCodeInput').focus();
+    return;
+  }
+  if(!confirm('このルームを強制削除します。よろしいですか？')) return;
+  await deleteCurrentRoom('マスターコードによりルームを強制削除しました。');
 }
 
 function cleanupOldRooms(){
@@ -281,6 +306,7 @@ $('refreshRoomsBtn').onclick = listenOpenRooms;
 $('cleanupRoomsBtn').onclick = cleanupOldRooms;
 $('startRoomBtn').onclick = startRoom;
 $('abortRoomBtn').onclick = abortRoom;
+$('forceDeleteRoomBtn').onclick = forceDeleteRoom;
 $('leaveRoomBtn').onclick = leaveRoom;
 $('backHomeBtn').onclick = () => show('setupScreen');
 

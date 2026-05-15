@@ -241,7 +241,23 @@ function cleanupOldRooms(){
   listenOpenRooms();
 }
 
-function leaveRoom(){
+async function leaveRoom(){
+  const leavingRoomId = currentRoomId;
+  const wasHost = localIsHost;
+
+  if(wasHost && leavingRoomId){
+    try{
+      await updateDoc(doc(db,'rooms',leavingRoomId),{
+        status:'deleted',
+        lockedJoin:true,
+        updatedAt:serverTimestamp()
+      });
+    }catch(e){
+      msg('roomMessage','ルーム削除に失敗しました：'+escapeHtml(e.message),'error');
+      return;
+    }
+  }
+
   if(roomUnsub) roomUnsub();
   if(playersUnsub) playersUnsub();
   currentRoomId = null;
@@ -257,6 +273,15 @@ $('startRoomBtn').onclick = startRoom;
 $('abortRoomBtn').onclick = abortRoom;
 $('leaveRoomBtn').onclick = leaveRoom;
 $('backHomeBtn').onclick = () => show('setupScreen');
+window.addEventListener('pagehide', () => {
+  if(localIsHost && currentRoomId && db){
+    updateDoc(doc(db,'rooms',currentRoomId),{
+      status:'deleted',
+      lockedJoin:true,
+      updatedAt:serverTimestamp()
+    }).catch(()=>{});
+  }
+});
 
 initFirebase().catch(e => msg('setupMessage','Firebase初期化エラー：'+escapeHtml(e.message),'error'));
 </script>

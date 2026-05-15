@@ -60,6 +60,26 @@
     <div id="roomMessage"></div>
   </section>
 
+  <section id="playScreen" class="screen">
+    <div class="hero"><h2>カードを選ぶ</h2><p>自分に配られた2枚から1枚を選び、じゃんけんの手を決めてロックしてください。</p></div>
+    <div class="panel">
+      <h3 id="playRoomName">---</h3>
+      <div id="myCardsArea"></div>
+      <div id="myHandsArea"></div>
+      <div class="row"><button class="main" id="lockChoiceBtn">この内容でロック</button></div>
+    </div>
+    <div class="panel">
+      <h3>選択状況</h3>
+      <div id="lockStatusList" class="players"></div>
+    </div>
+    <div class="panel hidden" id="hostRevealPanel">
+      <h3>ホスト操作</h3>
+      <p>全員がロックしたら、結果公開へ進めます。</p>
+      <div class="row"><button class="main" id="hostRevealBtn">一斉公開</button></div>
+    </div>
+    <div id="playMessage"></div>
+  </section>
+
   <section id="lockedScreen" class="screen">
     <div class="hero"><h2>このルームには参加できません</h2><p>すでにゲーム開始済み、または削除済みです。</p></div>
     <div class="panel"><button class="main" id="backHomeBtn">最初に戻る</button></div>
@@ -69,7 +89,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, getDocs, updateDoc, onSnapshot, collection, serverTimestamp, query, orderBy, writeBatch } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDcH2fuDlBNw7X8Bj5LmXEMu0s_vdMsh0M",
@@ -94,12 +114,24 @@ const clientId = sessionStorage.getItem('ogoriClientId') || ('client_' + Date.no
 sessionStorage.setItem('ogoriClientId', clientId);
 
 const $ = id => document.getElementById(id);
-const show = name => ['setupScreen','roomScreen','lockedScreen'].forEach(id => $(id).classList.toggle('active', id === name));
+const show = name => ['setupScreen','roomScreen','playScreen','lockedScreen'].forEach(id => $(id).classList.toggle('active', id === name));
 const msg = (id, text, type='notice') => { $(id).innerHTML = text ? `<div class="notice ${type}">${text}</div>` : ''; };
 const getPlayerName = () => $('playerName').value.trim();
 const safeRoomName = () => $('roomNameInput').value.trim() || 'おごりの鬼ルーム';
 const makeRoomId = () => 'room_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
-const escapeHtml = value => String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');
+const escapeHtml = value => String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('\"','&quot;').replaceAll("'",'&#039;');
+const regularNames=['ブリ','キジ','ヤマネコ','ひらくち','カッパ','シカ','イノシシ','トビウオ'];
+const rareNames=['キング','クイーン','エンジェル','デビル'];
+const hands=[{key:'rock',label:'グー',emoji:'✊'},{key:'scissors',label:'チョキ',emoji:'✌'},{key:'paper',label:'パー',emoji:'🖐'}];
+const cardIcons={'鬼':'👹','キング':'👑','クイーン':'💎','エンジェル':'🪽','デビル':'😈','ブリ':'🐟','キジ':'🐦','ヤマネコ':'🐆','ひらくち':'🐍','カッパ':'🥒','シカ':'🦌','イノシシ':'🐗','トビウオ':'🐟'};
+let currentRoomData=null;
+let currentPlayers=[];
+let selectedCardId=null;
+let selectedHand=null;
+function card(name,type){return{id:name+'-'+type+'-'+Math.random().toString(36).slice(2),name,type};}
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function rareSet(n){if(n<=5)return['キング'];if(n<=8)return['キング','クイーン'];if(n<=10)return['キング','クイーン','エンジェル'];return rareNames;}
+function makeDeck(n){const total=n*2,rares=rareSet(n),deck=[card('鬼','鬼'),card('鬼','鬼')];rares.forEach(name=>deck.push(card(name,'レア'),card(name,'レア')));const maxNames=Math.max(1,n-1),names=[{name:'鬼',type:'鬼'},...rares.map(name=>({name,type:'レア'}))];let i=0;while(names.length<maxNames){names.push({name:regularNames[i++%regularNames.length],type:'通常'});}const regs=names.filter(x=>x.type==='通常');i=0;while(deck.length<total){const e=regs[i++%regs.length];deck.push(card(e.name,e.type));}return shuffle(deck);}
 const roomAgeMs = room => room.createdAt?.toMillis ? Date.now() - room.createdAt.toMillis() : 0;
 const isVisibleWaitingRoom = room => room.status === 'waiting' && !room.lockedJoin && roomAgeMs(room) <= ROOM_VISIBLE_MS;
 
@@ -214,9 +246,14 @@ function listenRoom(roomId){
     const room = snap.data();
     $('roomNameDisplay').textContent = room.roomName || '名称未設定ルーム';
     if(room.status === 'waiting') $('statusPill').textContent = '待機中';
+    if(room.status === 'selecting') {
+      $('statusPill').textContent = '選択中';
+      currentRoomData = room;
+      show('playScreen');
+      renderOnlinePlay();
+    }
     if(room.status === 'started') {
       $('statusPill').textContent = '開始済み';
-      msg('roomMessage','ゲーム開始済みです。次の段階でカード配布・選択画面を接続します。','ok');
       $('startRoomBtn').disabled = true;
     }
     if(room.status === 'aborted' || room.status === 'deleted') {
@@ -233,17 +270,80 @@ function listenPlayers(roomId){
   playersUnsub = onSnapshot(q, snap => {
     const players = [];
     snap.forEach(d => players.push(d.data()));
+    currentPlayers = players;
     $('playersList').innerHTML = players.map(p => `<div class="player"><b>${escapeHtml(p.name)}</b><span class="tag ${p.isHost?'host':''}">${p.isHost?'ホスト':'参加者'}</span></div>`).join('') || '<p>参加者なし</p>';
+    renderOnlinePlay();
   });
 }
 
 async function startRoom(){
   if(!currentRoomId || !localIsHost) return;
-  await updateDoc(doc(db,'rooms',currentRoomId),{
-    status:'started',
+  const playersSnap = await getDocs(collection(db,'rooms',currentRoomId,'players'));
+  const players = [];
+  playersSnap.forEach(d => players.push(d.data()));
+  if(players.length < 4){
+    alert('4人以上で開始してください');
+    return;
+  }
+  const deck = makeDeck(players.length);
+  const batch = writeBatch(db);
+  players.forEach((p,i)=>{
+    batch.update(doc(db,'rooms',currentRoomId,'players',p.clientId),{
+      handCards:[deck[i*2],deck[i*2+1]],
+      selectedCardId:null,
+      selectedHand:null,
+      locked:false,
+      updatedAt:serverTimestamp()
+    });
+  });
+  batch.update(doc(db,'rooms',currentRoomId),{
+    status:'selecting',
     lockedJoin:true,
+    playerOrder:players.map(p=>p.clientId),
     updatedAt:serverTimestamp()
   });
+  await batch.commit();
+}
+
+function renderOnlinePlay(){
+  if(!currentRoomData || currentRoomData.status!=='selecting' || !currentPlayers.length || !$('playScreen').classList.contains('active')) return;
+  const me = currentPlayers.find(p=>p.clientId===clientId);
+  $('playRoomName').textContent = currentRoomData.roomName || 'おごりの鬼ルーム';
+  if(!me || !me.handCards){
+    $('myCardsArea').innerHTML = '<p>カード配布を待っています。</p>';
+    $('myHandsArea').innerHTML = '';
+    return;
+  }
+  selectedCardId = selectedCardId || me.selectedCardId;
+  selectedHand = selectedHand || me.selectedHand;
+  $('myCardsArea').innerHTML = '<label>カードを1枚選択</label><div class="room-list">'+me.handCards.map(c=>`<button class="room-card ${selectedCardId===c.id?'selected':''}" data-my-card="${c.id}"><b>${cardIcons[c.name]||'🎴'} ${escapeHtml(c.name)}</b><span>${escapeHtml(c.type)}カード</span></button>`).join('')+'</div>';
+  $('myHandsArea').innerHTML = '<label>じゃんけんの手を選択</label><div class="row">'+hands.map(h=>`<button class="ghost" data-my-hand="${h.key}">${h.emoji} ${h.label}</button>`).join('')+'</div>';
+  document.querySelectorAll('[data-my-card]').forEach(btn=>btn.onclick=()=>{selectedCardId=btn.dataset.myCard;renderOnlinePlay();});
+  document.querySelectorAll('[data-my-hand]').forEach(btn=>btn.onclick=()=>{selectedHand=btn.dataset.myHand;renderOnlinePlay();});
+  $('lockChoiceBtn').disabled = !!me.locked;
+  $('lockChoiceBtn').textContent = me.locked ? 'ロック済み' : 'この内容でロック';
+  const lockedCount = currentPlayers.filter(p=>p.locked).length;
+  $('lockStatusList').innerHTML = currentPlayers.map(p=>`<div class="player"><b>${escapeHtml(p.name)}</b><span class="tag ${p.locked?'host':''}">${p.locked?'ロック済み':'未選択'}</span></div>`).join('');
+  const allLocked = currentPlayers.length > 0 && lockedCount === currentPlayers.length;
+  $('hostRevealPanel').classList.toggle('hidden',!(localIsHost && allLocked));
+}
+
+async function lockChoice(){
+  if(!currentRoomId) return;
+  if(!selectedCardId || !selectedHand){
+    alert('カードとじゃんけんの手を選んでください');
+    return;
+  }
+  await updateDoc(doc(db,'rooms',currentRoomId,'players',clientId),{
+    selectedCardId,
+    selectedHand,
+    locked:true,
+    updatedAt:serverTimestamp()
+  });
+}
+
+async function hostReveal(){
+  alert('次の段階で、ペア判定・結果表示を接続します。');
 }
 
 async function deleteCurrentRoom(message='ルームを削除しました。'){
@@ -307,6 +407,8 @@ $('refreshRoomsBtn').onclick = listenOpenRooms;
 $('cleanupRoomsBtn').onclick = cleanupOldRooms;
 $('startRoomBtn').onclick = startRoom;
 $('abortRoomBtn').onclick = abortRoom;
+$('lockChoiceBtn').onclick = lockChoice;
+$('hostRevealBtn').onclick = hostReveal;
 $('forceDeleteRoomBtn').onclick = forceDeleteRoom;
 $('leaveRoomBtn').onclick = leaveRoom;
 $('backHomeBtn').onclick = () => show('setupScreen');

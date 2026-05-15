@@ -50,7 +50,7 @@
       <div class="row"><button class="main" id="startRoomBtn">ゲーム開始</button><button class="danger" id="abortRoomBtn">ルームを削除</button></div>
     </div>
     <div class="panel hidden" id="guestPanel"><h3>待機中</h3><p>ホストがゲームを開始するまで待ってください。</p></div>
-    <div class="row"><button class="ghost" id="leaveRoomBtn">退出</button></div>
+    <div class="row"><button class="ghost" id="leaveRoomBtn">退出</button></div><p class="small-note" style="color:#8b7468;font-size:12px;line-height:1.5">※ホストが退出するとルームは削除されます。参加者の退出では削除されません。</p>
     <div id="roomMessage"></div>
   </section>
 
@@ -87,7 +87,15 @@ let localIsHost = false;
 const $ = id => document.getElementById(id);
 const show = name => ['setupScreen','roomScreen','lockedScreen'].forEach(id => $(id).classList.toggle('active', id === name));
 const msg = (id, text, type='notice') => { $(id).innerHTML = text ? `<div class="notice ${type}">${text}</div>` : ''; };
-const safeName = () => $('playerName').value.trim() || 'プレイヤー';
+const getPlayerName = () => $('playerName').value.trim();
+function requirePlayerName(){
+  if(!getPlayerName()){
+    alert('プレイヤー名を入力してください');
+    $('playerName').focus();
+    return false;
+  }
+  return true;
+}
 const safeRoomName = () => $('roomNameInput').value.trim() || 'おごりの鬼ルーム';
 const makeRoomId = () => 'room_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
 const ROOM_VISIBLE_MS = 1000 * 60 * 60 * 6;
@@ -132,6 +140,7 @@ function listenOpenRooms(){
 }
 
 async function createRoom(){
+  if(!requirePlayerName()) return;
   if(!uid) return msg('setupMessage','Firebase接続中です。少し待ってから再度お試しください。','error');
   const roomId = makeRoomId();
   const roomName = safeRoomName();
@@ -148,7 +157,7 @@ async function createRoom(){
   await setDoc(doc(db,'rooms',roomId,'players',clientId),{
     uid,
     clientId,
-    name:safeName(),
+    name:getPlayerName(),
     isHost:true,
     joinedAt:serverTimestamp()
   });
@@ -156,6 +165,7 @@ async function createRoom(){
 }
 
 async function joinRoom(roomId){
+  if(!requirePlayerName()) return;
   if(!uid) return msg('setupMessage','Firebase接続中です。少し待ってから再度お試しください。','error');
   const roomRef = doc(db,'rooms',roomId);
   const snap = await getDoc(roomRef);
@@ -168,7 +178,7 @@ async function joinRoom(roomId){
   await setDoc(doc(db,'rooms',roomId,'players',clientId),{
     uid,
     clientId,
-    name:safeName(),
+    name:getPlayerName(),
     isHost:false,
     joinedAt:serverTimestamp()
   });
@@ -273,15 +283,6 @@ $('startRoomBtn').onclick = startRoom;
 $('abortRoomBtn').onclick = abortRoom;
 $('leaveRoomBtn').onclick = leaveRoom;
 $('backHomeBtn').onclick = () => show('setupScreen');
-window.addEventListener('pagehide', () => {
-  if(localIsHost && currentRoomId && db){
-    updateDoc(doc(db,'rooms',currentRoomId),{
-      status:'deleted',
-      lockedJoin:true,
-      updatedAt:serverTimestamp()
-    }).catch(()=>{});
-  }
-});
 
 initFirebase().catch(e => msg('setupMessage','Firebase初期化エラー：'+escapeHtml(e.message),'error'));
 </script>

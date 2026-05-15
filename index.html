@@ -12,7 +12,7 @@
 <header><div class="wrap head"><div class="brand"><h1>おごりの鬼</h1><span>オンラインルーム版｜一覧参加方式</span></div><div class="pill" id="statusPill">未接続</div></div></header>
 <main class="wrap">
   <section id="setupScreen" class="screen active">
-    <div class="hero"><h2>オンラインで遊ぶ</h2><p>ホストはルームを作成。参加者は一覧からルーム名をタップして参加します。</p></div>
+    <div class="hero"><h2>オンラインで遊ぶ</h2><p>ホストはルームを作成。参加者は一覧からルーム名をタップして参加します。</p><p>同じ端末でテストする場合は、通常タブとシークレットタブ、または別ブラウザを使うと確実です。</p></div>
 
     <div class="panel">
       <label for="playerName">プレイヤー名</label>
@@ -62,7 +62,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, serverTimestamp, query, orderBy, where } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDcH2fuDlBNw7X8Bj5LmXEMu0s_vdMsh0M",
@@ -76,6 +76,8 @@ const firebaseConfig = {
 
 let app, auth, db, uid = null;
 let currentRoomId = null;
+const clientId = sessionStorage.getItem('ogoriClientId') || ('client_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8));
+sessionStorage.setItem('ogoriClientId', clientId);
 let roomUnsub = null;
 let playersUnsub = null;
 let roomListUnsub = null;
@@ -101,10 +103,17 @@ async function initFirebase(){
 
 function listenOpenRooms(){
   if(roomListUnsub) roomListUnsub();
-  const q = query(collection(db,'rooms'), where('status','==','waiting'), orderBy('createdAt','desc'));
+
+  // orderBy / where を使うと、Firestore側のインデックス設定やルールにより失敗することがあるため、
+  // まずは全roomsを購読し、画面側で待機中ルームだけに絞り込む。
+  const q = collection(db,'rooms');
   roomListUnsub = onSnapshot(q, snap => {
     const rooms = [];
-    snap.forEach(d => rooms.push({ id:d.id, ...d.data() }));
+    snap.forEach(d => {
+      const room = { id:d.id, ...d.data() };
+      if(room.status === 'waiting' && !room.lockedJoin) rooms.push(room);
+    });
+    rooms.sort((a,b) => String(b.createdAt?.seconds || '').localeCompare(String(a.createdAt?.seconds || '')));
     $('roomList').innerHTML = rooms.length ? rooms.map(room => `
       <button class="room-card" data-join-room="${escapeHtml(room.roomId)}">
         <b>${escapeHtml(room.roomName || '名称未設定ルーム')}</b>
@@ -114,6 +123,7 @@ function listenOpenRooms(){
     document.querySelectorAll('[data-join-room]').forEach(btn => {
       btn.onclick = () => joinRoom(btn.dataset.joinRoom);
     });
+    msg('setupMessage','');
   }, e => msg('setupMessage','ルーム一覧取得エラー：'+escapeHtml(e.message),'error'));
 }
 
@@ -125,13 +135,15 @@ async function createRoom(){
     roomId,
     roomName,
     hostUid:uid,
+    hostClientId:clientId,
     status:'waiting',
     lockedJoin:false,
     createdAt:serverTimestamp(),
     updatedAt:serverTimestamp()
   });
-  await setDoc(doc(db,'rooms',roomId,'players',uid),{
+  await setDoc(doc(db,'rooms',roomId,'players',clientId),{
     uid,
+    clientId,
     name:safeName(),
     isHost:true,
     joinedAt:serverTimestamp()
@@ -149,8 +161,9 @@ async function joinRoom(roomId){
     show('lockedScreen');
     return;
   }
-  await setDoc(doc(db,'rooms',roomId,'players',uid),{
+  await setDoc(doc(db,'rooms',roomId,'players',clientId),{
     uid,
+    clientId,
     name:safeName(),
     isHost:false,
     joinedAt:serverTimestamp()

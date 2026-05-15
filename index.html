@@ -22,6 +22,7 @@
       <div class="row">
         <button class="main" id="createRoomBtn">ルームを作る</button>
         <button class="ghost" id="refreshRoomsBtn">一覧を更新</button>
+        <button class="danger" id="cleanupRoomsBtn">古いルームを整理</button>
       </div>
     </div>
 
@@ -46,7 +47,7 @@
     <div class="panel" id="hostPanel">
       <h3>ホスト操作</h3>
       <p>ゲーム開始後、このルームは一覧から消え、途中参加できなくなります。</p>
-      <div class="row"><button class="main" id="startRoomBtn">ゲーム開始</button><button class="danger" id="abortRoomBtn">ゲーム中断</button></div>
+      <div class="row"><button class="main" id="startRoomBtn">ゲーム開始</button><button class="danger" id="abortRoomBtn">ルームを削除</button></div>
     </div>
     <div class="panel hidden" id="guestPanel"><h3>待機中</h3><p>ホストがゲームを開始するまで待ってください。</p></div>
     <div class="row"><button class="ghost" id="leaveRoomBtn">退出</button></div>
@@ -89,6 +90,9 @@ const msg = (id, text, type='notice') => { $(id).innerHTML = text ? `<div class=
 const safeName = () => $('playerName').value.trim() || 'プレイヤー';
 const safeRoomName = () => $('roomNameInput').value.trim() || 'おごりの鬼ルーム';
 const makeRoomId = () => 'room_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
+const ROOM_VISIBLE_MS = 1000 * 60 * 60 * 6;
+const roomAgeMs = room => room.createdAt?.toMillis ? Date.now() - room.createdAt.toMillis() : 0;
+const isVisibleWaitingRoom = room => room.status === 'waiting' && !room.lockedJoin && roomAgeMs(room) <= ROOM_VISIBLE_MS;
 const escapeHtml = value => String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');
 
 async function initFirebase(){
@@ -111,7 +115,7 @@ function listenOpenRooms(){
     const rooms = [];
     snap.forEach(d => {
       const room = { id:d.id, ...d.data() };
-      if(room.status === 'waiting' && !room.lockedJoin) rooms.push(room);
+      if(isVisibleWaitingRoom(room)) rooms.push(room);
     });
     rooms.sort((a,b) => String(b.createdAt?.seconds || '').localeCompare(String(a.createdAt?.seconds || '')));
     $('roomList').innerHTML = rooms.length ? rooms.map(room => `
@@ -195,9 +199,9 @@ function listenRoom(roomId){
       msg('roomMessage','ゲーム開始済みです。次の段階でカード配布・選択画面を接続します。','ok');
       $('startRoomBtn').disabled = true;
     }
-    if(room.status === 'aborted') {
-      $('statusPill').textContent = '中断';
-      msg('roomMessage','ホストによりゲームが中断されました。','error');
+    if(room.status === 'aborted' || room.status === 'deleted') {
+      $('statusPill').textContent = '削除済み';
+      msg('roomMessage','このルームは削除されました。','error');
       $('startRoomBtn').disabled = true;
     }
   });
@@ -225,10 +229,16 @@ async function startRoom(){
 async function abortRoom(){
   if(!currentRoomId || !localIsHost) return;
   await updateDoc(doc(db,'rooms',currentRoomId),{
-    status:'aborted',
+    status:'deleted',
     lockedJoin:true,
     updatedAt:serverTimestamp()
   });
+  msg('roomMessage','ルームを一覧から削除しました。','ok');
+}
+
+function cleanupOldRooms(){
+  msg('setupMessage','6時間以上前の待機ルームは自動的に一覧から非表示になります。不要な自分のルームは待機画面の「ルームを削除」で消してください。','ok');
+  listenOpenRooms();
 }
 
 function leaveRoom(){
@@ -242,6 +252,7 @@ function leaveRoom(){
 
 $('createRoomBtn').onclick = createRoom;
 $('refreshRoomsBtn').onclick = listenOpenRooms;
+$('cleanupRoomsBtn').onclick = cleanupOldRooms;
 $('startRoomBtn').onclick = startRoom;
 $('abortRoomBtn').onclick = abortRoom;
 $('leaveRoomBtn').onclick = leaveRoom;

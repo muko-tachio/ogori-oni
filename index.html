@@ -3,30 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>おごりの鬼｜Firebaseルーム試作</title>
+<title>おごりの鬼｜オンラインルーム版</title>
 <style>
-:root{--bg:#120b08;--bg2:#26110d;--card:#fffbf5;--ink:#241714;--light:#fff8ed;--muted:#8b7468;--line:rgba(120,79,57,.24);--main:#dc2626;--dark:#7f1d1d;--gold:#f59e0b;--safe:#047857;--shadow:0 16px 40px rgba(0,0,0,.25);--soft:0 8px 20px rgba(41,22,14,.12);--r:22px}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 20% 0%,rgba(245,158,11,.22),transparent 30%),radial-gradient(circle at 85% 12%,rgba(220,38,38,.25),transparent 28%),linear-gradient(160deg,var(--bg),var(--bg2) 55%,#080504);color:var(--ink);min-height:100vh}.wrap{max-width:860px;margin:0 auto;padding:16px}header{position:sticky;top:0;z-index:10;background:rgba(18,11,8,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,248,237,.1)}.head{display:flex;justify-content:space-between;gap:12px;align-items:center}.brand{color:var(--light)}.brand h1{margin:0;font-size:22px;letter-spacing:.08em}.brand span{font-size:12px;color:rgba(255,248,237,.62)}.pill{padding:8px 12px;border-radius:999px;background:linear-gradient(135deg,var(--main),var(--dark));color:white;font-size:12px;font-weight:900}.screen{display:none}.screen.active{display:block}.hero,.panel{background:rgba(255,251,245,.96);border:1px solid rgba(255,248,237,.35);border-radius:var(--r);box-shadow:var(--soft);padding:18px;margin:16px 0}.hero{color:var(--light);background:linear-gradient(135deg,rgba(127,29,29,.96),rgba(36,23,20,.94));box-shadow:var(--shadow)}h2,h3{margin:0 0 10px}p{margin:6px 0;color:var(--muted);line-height:1.65}.hero p{color:rgba(255,248,237,.82)}label{display:block;font-size:13px;font-weight:900;margin:12px 0 8px}input{width:100%;padding:14px;border-radius:14px;border:1px solid var(--line);background:#fffaf4;font-size:16px;color:var(--ink)}.row{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}button{border:0;border-radius:16px;padding:13px 16px;font-weight:950;font-size:15px;cursor:pointer;letter-spacing:.02em}button:disabled{opacity:.45;cursor:not-allowed}.main{background:linear-gradient(135deg,#ef4444,#991b1b);color:white;box-shadow:0 10px 24px rgba(185,28,28,.28)}.sub{background:linear-gradient(135deg,#2b211d,#0f0a08);color:white}.ghost{background:#fff7ed;color:#4b2e25;border:1px solid var(--line)}.danger{background:#fff1f2;color:#991b1b;border:1px solid #fecdd3}.copy{background:#fff1c7;color:#7c3f00}.notice{border-left:5px solid var(--gold);background:#fff1c7;padding:12px 14px;border-radius:14px;color:#7c3f00;font-size:14px;line-height:1.55;font-weight:700}.error{border-left-color:#ef4444;background:#fee2e2;color:#7f1d1d}.ok{border-left-color:var(--safe);background:#dcfce7;color:#065f46}.code{font-size:34px;font-weight:950;letter-spacing:.16em;text-align:center;padding:18px;border-radius:18px;background:#1f1410;color:#fff8ed;margin:12px 0}.players{display:grid;gap:10px}.player{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:14px;background:#fffaf4;border:1px solid rgba(120,79,57,.18)}.player b{font-size:16px}.tag{font-size:12px;font-weight:950;padding:5px 8px;border-radius:999px;background:#f8efe6;color:var(--muted)}.tag.host{background:#fee2e2;color:#991b1b}.small{font-size:12px;color:var(--muted)}.hidden{display:none!important}
+:root{--bg:#120b08;--bg2:#26110d;--card:#fffbf5;--ink:#241714;--light:#fff8ed;--muted:#8b7468;--line:rgba(120,79,57,.24);--main:#dc2626;--dark:#7f1d1d;--gold:#f59e0b;--safe:#047857;--shadow:0 16px 40px rgba(0,0,0,.25);--soft:0 8px 20px rgba(41,22,14,.12);--r:22px}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 20% 0%,rgba(245,158,11,.22),transparent 30%),radial-gradient(circle at 85% 12%,rgba(220,38,38,.25),transparent 28%),linear-gradient(160deg,var(--bg),var(--bg2) 55%,#080504);color:var(--ink);min-height:100vh}.wrap{max-width:860px;margin:0 auto;padding:16px}header{position:sticky;top:0;z-index:10;background:rgba(18,11,8,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,248,237,.1)}.head{display:flex;justify-content:space-between;gap:12px;align-items:center}.brand{color:var(--light)}.brand h1{margin:0;font-size:22px;letter-spacing:.08em}.brand span{font-size:12px;color:rgba(255,248,237,.62)}.pill{padding:8px 12px;border-radius:999px;background:linear-gradient(135deg,var(--main),var(--dark));color:white;font-size:12px;font-weight:900}.screen{display:none}.screen.active{display:block}.hero,.panel{background:rgba(255,251,245,.96);border:1px solid rgba(255,248,237,.35);border-radius:var(--r);box-shadow:var(--soft);padding:18px;margin:16px 0}.hero{color:var(--light);background:linear-gradient(135deg,rgba(127,29,29,.96),rgba(36,23,20,.94));box-shadow:var(--shadow)}h2,h3{margin:0 0 10px}p{margin:6px 0;color:var(--muted);line-height:1.65}.hero p{color:rgba(255,248,237,.82)}label{display:block;font-size:13px;font-weight:900;margin:12px 0 8px}input{width:100%;padding:14px;border-radius:14px;border:1px solid var(--line);background:#fffaf4;font-size:16px;color:var(--ink)}.row{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}button{border:0;border-radius:16px;padding:13px 16px;font-weight:950;font-size:15px;cursor:pointer;letter-spacing:.02em}button:disabled{opacity:.45;cursor:not-allowed}.main{background:linear-gradient(135deg,#ef4444,#991b1b);color:white;box-shadow:0 10px 24px rgba(185,28,28,.28)}.sub{background:linear-gradient(135deg,#2b211d,#0f0a08);color:white}.ghost{background:#fff7ed;color:#4b2e25;border:1px solid var(--line)}.danger{background:#fff1f2;color:#991b1b;border:1px solid #fecdd3}.notice{border-left:5px solid var(--gold);background:#fff1c7;padding:12px 14px;border-radius:14px;color:#7c3f00;font-size:14px;line-height:1.55;font-weight:700}.error{border-left-color:#ef4444;background:#fee2e2;color:#7f1d1d}.ok{border-left-color:var(--safe);background:#dcfce7;color:#065f46}.room-list{display:grid;gap:10px}.room-card{width:100%;text-align:left;padding:14px;border-radius:16px;background:#fffaf4;border:1px solid rgba(120,79,57,.2);color:var(--ink);box-shadow:var(--soft)}.room-card b{display:block;font-size:18px;margin-bottom:4px}.room-card span{font-size:12px;color:var(--muted);font-weight:850}.room-card.locked{opacity:.62}.players{display:grid;gap:10px}.player{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:14px;background:#fffaf4;border:1px solid rgba(120,79,57,.18)}.player b{font-size:16px}.tag{font-size:12px;font-weight:950;padding:5px 8px;border-radius:999px;background:#f8efe6;color:var(--muted)}.tag.host{background:#fee2e2;color:#991b1b}.room-name-big{font-size:32px;font-weight:950;letter-spacing:.04em;text-align:center;padding:18px;border-radius:18px;background:#1f1410;color:#fff8ed;margin:12px 0}.hidden{display:none!important}
 </style>
 </head>
 <body>
-<header><div class="wrap head"><div class="brand"><h1>おごりの鬼</h1><span>Firebaseルーム試作｜第1段階</span></div><div class="pill" id="statusPill">未接続</div></div></header>
+<header><div class="wrap head"><div class="brand"><h1>おごりの鬼</h1><span>オンラインルーム版｜一覧参加方式</span></div><div class="pill" id="statusPill">未接続</div></div></header>
 <main class="wrap">
   <section id="setupScreen" class="screen active">
-    <div class="hero"><h2>オンライン版の入口</h2><p>まずは、ルーム作成・参加・参加者一覧の同期だけを確認します。</p></div>
-    <div class="panel">
-      <h3>はじめに必要なこと</h3>
-      <p>この試作版を動かすには、Firebaseの設定値をHTML内の <b>firebaseConfig</b> に貼り付ける必要があります。</p>
-      <div class="notice">Firebase設定が未入力の場合、画面は動きますがルーム作成・参加はできません。</div>
-    </div>
+    <div class="hero"><h2>オンラインで遊ぶ</h2><p>ホストはルームを作成。参加者は一覧からルーム名をタップして参加します。</p></div>
+
     <div class="panel">
       <label for="playerName">プレイヤー名</label>
       <input id="playerName" placeholder="例：たちお">
-      <label for="roomCodeInput">参加するルームID</label>
-      <input id="roomCodeInput" placeholder="例：A7K3QZ" autocapitalize="characters">
+      <label for="roomNameInput">作成するルーム名</label>
+      <input id="roomNameInput" placeholder="例：今日のおごり勝負">
       <div class="row">
         <button class="main" id="createRoomBtn">ルームを作る</button>
-        <button class="sub" id="joinRoomBtn">ルームに参加</button>
+        <button class="ghost" id="refreshRoomsBtn">一覧を更新</button>
       </div>
+    </div>
+
+    <div class="panel">
+      <h3>参加できるルーム</h3>
+      <p>待機中のルームだけが表示されます。参加したいルーム名をタップしてください。</p>
+      <div id="roomList" class="room-list"></div>
     </div>
     <div id="setupMessage"></div>
   </section>
@@ -34,9 +36,8 @@
   <section id="roomScreen" class="screen">
     <div class="hero"><h2>ルーム待機中</h2><p>ホストがゲーム開始を押すまで参加者を待ちます。開始後の途中参加はできません。</p></div>
     <div class="panel">
-      <h3>ルームID</h3>
-      <div class="code" id="roomCodeDisplay">------</div>
-      <div class="row"><button class="copy" id="copyRoomBtn">ルームIDをコピー</button><button class="ghost" id="leaveRoomBtn">退出</button></div>
+      <h3>ルーム名</h3>
+      <div class="room-name-big" id="roomNameDisplay">---</div>
     </div>
     <div class="panel">
       <h3>参加者</h3>
@@ -44,15 +45,16 @@
     </div>
     <div class="panel" id="hostPanel">
       <h3>ホスト操作</h3>
-      <p>第1段階では、ゲーム開始を押すと途中参加をロックし、状態だけを「開始済み」にします。</p>
+      <p>ゲーム開始後、このルームは一覧から消え、途中参加できなくなります。</p>
       <div class="row"><button class="main" id="startRoomBtn">ゲーム開始</button><button class="danger" id="abortRoomBtn">ゲーム中断</button></div>
     </div>
     <div class="panel hidden" id="guestPanel"><h3>待機中</h3><p>ホストがゲームを開始するまで待ってください。</p></div>
+    <div class="row"><button class="ghost" id="leaveRoomBtn">退出</button></div>
     <div id="roomMessage"></div>
   </section>
 
   <section id="lockedScreen" class="screen">
-    <div class="hero"><h2>ルームは開始済みです</h2><p>このルームは途中参加できません。</p></div>
+    <div class="hero"><h2>このルームには参加できません</h2><p>すでにゲーム開始済み、または中断済みです。</p></div>
     <div class="panel"><button class="main" id="backHomeBtn">最初に戻る</button></div>
   </section>
 </main>
@@ -60,10 +62,8 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, serverTimestamp, query, orderBy, where } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
-// ここにFirebaseコンソールで取得した設定を貼り付けます。
-// 例：const firebaseConfig = { apiKey: "...", authDomain: "...", projectId: "..." };
 const firebaseConfig = {
   apiKey: "AIzaSyDcH2fuDlBNw7X8Bj5LmXEMu0s_vdMsh0M",
   authDomain: "ogori-oni.firebaseapp.com",
@@ -78,43 +78,52 @@ let app, auth, db, uid = null;
 let currentRoomId = null;
 let roomUnsub = null;
 let playersUnsub = null;
+let roomListUnsub = null;
 let localIsHost = false;
 
 const $ = id => document.getElementById(id);
-const show = name => {
-  ['setupScreen','roomScreen','lockedScreen'].forEach(id => $(id).classList.toggle('active', id === name));
-};
+const show = name => ['setupScreen','roomScreen','lockedScreen'].forEach(id => $(id).classList.toggle('active', id === name));
 const msg = (id, text, type='notice') => { $(id).innerHTML = text ? `<div class="notice ${type}">${text}</div>` : ''; };
 const safeName = () => $('playerName').value.trim() || 'プレイヤー';
-const hasConfig = () => firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId;
-const makeRoomId = () => {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let s = '';
-  for (let i=0;i<6;i++) s += chars[Math.floor(Math.random()*chars.length)];
-  return s;
-};
+const safeRoomName = () => $('roomNameInput').value.trim() || 'おごりの鬼ルーム';
+const makeRoomId = () => 'room_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
+const escapeHtml = value => String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');
 
 async function initFirebase(){
-  if(!hasConfig()){
-    $('statusPill').textContent = '設定未入力';
-    msg('setupMessage','Firebase設定値が未入力です。Firebaseプロジェクト作成後、firebaseConfigに貼り付けてください。','error');
-    return;
-  }
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
   db = getFirestore(app);
   onAuthStateChanged(auth, user => {
-    if(user){ uid = user.uid; $('statusPill').textContent = '接続中'; }
+    if(user){ uid = user.uid; $('statusPill').textContent = '接続中'; listenOpenRooms(); }
   });
   await signInAnonymously(auth);
 }
 
+function listenOpenRooms(){
+  if(roomListUnsub) roomListUnsub();
+  const q = query(collection(db,'rooms'), where('status','==','waiting'), orderBy('createdAt','desc'));
+  roomListUnsub = onSnapshot(q, snap => {
+    const rooms = [];
+    snap.forEach(d => rooms.push({ id:d.id, ...d.data() }));
+    $('roomList').innerHTML = rooms.length ? rooms.map(room => `
+      <button class="room-card" data-join-room="${escapeHtml(room.roomId)}">
+        <b>${escapeHtml(room.roomName || '名称未設定ルーム')}</b>
+        <span>参加者募集中</span>
+      </button>
+    `).join('') : '<p>現在、参加できるルームはありません。</p>';
+    document.querySelectorAll('[data-join-room]').forEach(btn => {
+      btn.onclick = () => joinRoom(btn.dataset.joinRoom);
+    });
+  }, e => msg('setupMessage','ルーム一覧取得エラー：'+escapeHtml(e.message),'error'));
+}
+
 async function createRoom(){
-  if(!uid) return msg('setupMessage','Firebase接続が完了していません。設定値を確認してください。','error');
+  if(!uid) return msg('setupMessage','Firebase接続中です。少し待ってから再度お試しください。','error');
   const roomId = makeRoomId();
-  const roomRef = doc(db,'rooms',roomId);
-  await setDoc(roomRef,{
+  const roomName = safeRoomName();
+  await setDoc(doc(db,'rooms',roomId),{
     roomId,
+    roomName,
     hostUid:uid,
     status:'waiting',
     lockedJoin:false,
@@ -127,13 +136,11 @@ async function createRoom(){
     isHost:true,
     joinedAt:serverTimestamp()
   });
-  enterRoom(roomId,true);
+  enterRoom(roomId,roomName,true);
 }
 
-async function joinRoom(){
-  if(!uid) return msg('setupMessage','Firebase接続が完了していません。設定値を確認してください。','error');
-  const roomId = $('roomCodeInput').value.trim().toUpperCase();
-  if(!roomId) return msg('setupMessage','ルームIDを入力してください。','error');
+async function joinRoom(roomId){
+  if(!uid) return msg('setupMessage','Firebase接続中です。少し待ってから再度お試しください。','error');
   const roomRef = doc(db,'rooms',roomId);
   const snap = await getDoc(roomRef);
   if(!snap.exists()) return msg('setupMessage','ルームが見つかりません。','error');
@@ -148,13 +155,13 @@ async function joinRoom(){
     isHost:false,
     joinedAt:serverTimestamp()
   });
-  enterRoom(roomId,false);
+  enterRoom(roomId,room.roomName || '名称未設定ルーム',false);
 }
 
-function enterRoom(roomId,isHost){
+function enterRoom(roomId,roomName,isHost){
   currentRoomId = roomId;
   localIsHost = isHost;
-  $('roomCodeDisplay').textContent = roomId;
+  $('roomNameDisplay').textContent = roomName;
   $('hostPanel').classList.toggle('hidden',!isHost);
   $('guestPanel').classList.toggle('hidden',isHost);
   msg('setupMessage','');
@@ -168,6 +175,7 @@ function listenRoom(roomId){
   roomUnsub = onSnapshot(doc(db,'rooms',roomId), snap => {
     if(!snap.exists()) return;
     const room = snap.data();
+    $('roomNameDisplay').textContent = room.roomName || '名称未設定ルーム';
     if(room.status === 'waiting') $('statusPill').textContent = '待機中';
     if(room.status === 'started') {
       $('statusPill').textContent = '開始済み';
@@ -219,20 +227,12 @@ function leaveRoom(){
   show('setupScreen');
 }
 
-function escapeHtml(value){
-  return String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');
-}
-
 $('createRoomBtn').onclick = createRoom;
-$('joinRoomBtn').onclick = joinRoom;
+$('refreshRoomsBtn').onclick = listenOpenRooms;
 $('startRoomBtn').onclick = startRoom;
 $('abortRoomBtn').onclick = abortRoom;
 $('leaveRoomBtn').onclick = leaveRoom;
 $('backHomeBtn').onclick = () => show('setupScreen');
-$('copyRoomBtn').onclick = async () => {
-  try { await navigator.clipboard.writeText(currentRoomId || ''); msg('roomMessage','ルームIDをコピーしました。','ok'); }
-  catch { msg('roomMessage','コピーできませんでした。ルームIDを手動で共有してください。','error'); }
-};
 
 initFirebase().catch(e => msg('setupMessage','Firebase初期化エラー：'+escapeHtml(e.message),'error'));
 </script>

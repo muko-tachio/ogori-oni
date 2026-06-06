@@ -8,23 +8,33 @@
 :root{--bg:#120b08;--bg2:#26110d;--card:#fffbf5;--ink:#241714;--light:#fff8ed;--muted:#8b7468;--line:rgba(120,79,57,.24);--main:#dc2626;--dark:#7f1d1d;--gold:#f59e0b;--safe:#047857;--shadow:0 16px 40px rgba(0,0,0,.25);--soft:0 8px 20px rgba(41,22,14,.12);--r:22px}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 20% 0%,rgba(245,158,11,.22),transparent 30%),radial-gradient(circle at 85% 12%,rgba(220,38,38,.25),transparent 28%),linear-gradient(160deg,var(--bg),var(--bg2) 55%,#080504);color:var(--ink);min-height:100vh}.wrap{max-width:860px;margin:0 auto;padding:16px}header{position:sticky;top:0;z-index:10;background:rgba(18,11,8,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,248,237,.1)}.head{display:flex;justify-content:space-between;gap:12px;align-items:center}.brand{color:var(--light)}.brand h1{margin:0;font-size:22px;letter-spacing:.08em}.brand span{font-size:12px;color:rgba(255,248,237,.62)}.pill{padding:8px 12px;border-radius:999px;background:linear-gradient(135deg,var(--main),var(--dark));color:white;font-size:12px;font-weight:900}.screen{display:none}.screen.active{display:block}.hero,.panel{background:rgba(255,251,245,.96);border:1px solid rgba(255,248,237,.35);border-radius:var(--r);box-shadow:var(--soft);padding:18px;margin:16px 0}.hero{color:var(--light);background:linear-gradient(135deg,rgba(127,29,29,.96),rgba(36,23,20,.94));box-shadow:var(--shadow)}h2,h3{margin:0 0 10px}p{margin:6px 0;color:var(--muted);line-height:1.65}.hero p{color:rgba(255,248,237,.82)}label{display:block;font-size:13px;font-weight:900;margin:12px 0 8px}input{width:100%;padding:14px;border-radius:14px;border:1px solid var(--line);background:#fffaf4;font-size:16px;color:var(--ink)}.row{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}button{border:0;border-radius:16px;padding:13px 16px;font-weight:950;font-size:15px;cursor:pointer;letter-spacing:.02em}button:disabled{opacity:.45;cursor:not-allowed}.main{background:linear-gradient(135deg,#ef4444,#991b1b);color:white;box-shadow:0 10px 24px rgba(185,28,28,.28)}.sub{background:linear-gradient(135deg,#2b211d,#0f0a08);color:white}.ghost{background:#fff7ed;color:#4b2e25;border:1px solid var(--line)}.danger{background:#fff1f2;color:#991b1b;border:1px solid #fecdd3}.notice{border-left:5px solid var(--gold);background:#fff1c7;padding:12px 14px;border-radius:14px;color:#7c3f00;font-size:14px;line-height:1.55;font-weight:700}.error{border-left-color:#ef4444;background:#fee2e2;color:#7f1d1d}.ok{border-left-color:var(--safe);background:#dcfce7;color:#065f46}.room-list{display:grid;gap:10px}.room-card{width:100%;text-align:left;padding:14px;border-radius:16px;background:#fffaf4;border:1px solid rgba(120,79,57,.2);color:var(--ink);box-shadow:var(--soft)}.room-card b{display:block;font-size:18px;margin-bottom:4px}.room-card span{font-size:12px;color:var(--muted);font-weight:850}.room-card.selected{border:3px solid var(--main);background:#fff1f2;box-shadow:0 0 0 4px rgba(220,38,38,.15),var(--soft)}.hand-btn{min-width:96px}.hand-btn.selected{border:3px solid var(--main);background:#fff1f2;color:#7f1d1d}.players{display:grid;gap:10px}.player{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:14px;background:#fffaf4;border:1px solid rgba(120,79,57,.18)}.player b{font-size:16px}.tag{font-size:12px;font-weight:950;padding:5px 8px;border-radius:999px;background:#f8efe6;color:var(--muted)}.tag.host{background:#fee2e2;color:#991b1b}.room-name-big{font-size:32px;font-weight:950;letter-spacing:.04em;text-align:center;padding:18px;border-radius:18px;background:#1f1410;color:#fff8ed;margin:12px 0}.small-note{color:#8b7468;font-size:12px;line-height:1.5}.hidden{display:none!important}.roulette-summary{display:grid;gap:8px;margin-bottom:14px}.roulette-board{display:grid;gap:16px;justify-items:center}.roulette-wheel-wrap{position:relative;width:min(100%,420px);aspect-ratio:1/1;padding:10px;border-radius:999px;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.26),transparent 22%),linear-gradient(135deg,#3b1d16,#160d09);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),0 16px 36px rgba(0,0,0,.22)}.roulette-wheel-canvas{width:100%;height:100%;display:block;border-radius:50%}.roulette-pointer{position:absolute;left:50%;top:-4px;transform:translateX(-50%);width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:0;border-bottom:34px solid #f59e0b;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35));z-index:3}.roulette-pointer:after{content:"";position:absolute;left:-7px;top:2px;width:14px;height:14px;border-radius:50%;background:#fff7ed;border:2px solid rgba(120,79,57,.24)}.roulette-center-note{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:2}.roulette-spin-badge{padding:8px 12px;border-radius:999px;background:rgba(31,20,16,.82);color:#fff8ed;font-size:12px;font-weight:950;letter-spacing:.06em;border:1px solid rgba(255,255,255,.08)}.roulette-legend{width:100%;display:grid;gap:8px}.roulette-legend-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:14px;background:#fffaf4;border:1px solid rgba(120,79,57,.18)}.roulette-legend-main{display:flex;align-items:center;gap:10px;min-width:0}.roulette-color-dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.85);box-shadow:0 2px 8px rgba(0,0,0,.15);flex:0 0 14px}.roulette-legend-name{font-weight:950}.roulette-legend-sub{font-size:12px;color:var(--muted);font-weight:800}.roulette-final{margin-top:6px;padding:16px;border-radius:20px;background:linear-gradient(135deg,#7f1d1d,#dc2626);color:white;text-align:center;box-shadow:var(--shadow)}.roulette-final b{display:block;font-size:32px;letter-spacing:.04em;margin:8px 0}.roulette-final p{color:rgba(255,255,255,.86)}.mini-grid{display:grid;gap:8px}.badge-row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.badge{font-size:12px;font-weight:950;border-radius:999px;padding:7px 10px;background:#fff7ed;border:1px solid var(--line);color:#4b2e25}.badge.safe{background:#dcfce7;color:#065f46}.badge.danger{background:#fee2e2;color:#991b1b}.badge.gold{background:#fef3c7;color:#92400e}
 .rule-panel{background:linear-gradient(135deg,#fffaf4,#fff7ed);border:1px solid rgba(120,79,57,.22)}.rule-details{border-radius:18px;background:#fffaf4;border:1px solid rgba(120,79,57,.2);overflow:hidden}.rule-details summary{list-style:none;cursor:pointer;padding:16px 16px;font-weight:950;font-size:17px;color:#4b2e25;display:flex;justify-content:space-between;align-items:center;gap:12px}.rule-details summary::-webkit-details-marker{display:none}.rule-details summary:after{content:"開く";font-size:12px;font-weight:950;color:#991b1b;background:#fee2e2;border-radius:999px;padding:5px 9px;white-space:nowrap}.rule-details[open] summary:after{content:"閉じる"}.rule-content{padding:0 16px 16px}.rule-lead{font-weight:900;color:#7f1d1d;background:#fff1f2;border-left:5px solid #dc2626;padding:12px;border-radius:14px;margin:0 0 12px}.rule-steps{display:grid;gap:9px;margin:12px 0}.rule-step{display:flex;gap:10px;align-items:flex-start;background:white;border:1px solid rgba(120,79,57,.16);border-radius:14px;padding:10px}.rule-no{flex:0 0 26px;height:26px;border-radius:999px;background:#7f1d1d;color:white;display:grid;place-items:center;font-size:13px;font-weight:950}.rule-step b{display:block;color:#241714;margin-bottom:2px}.rule-step span{display:block;color:#8b7468;font-size:13px;line-height:1.5}.rule-important{display:grid;gap:8px;margin-top:12px}.rule-important .notice{margin:0}.rule-mini-title{font-size:13px;font-weight:950;color:#4b2e25;margin:14px 0 6px}.rule-chip-row{display:flex;flex-wrap:wrap;gap:8px}.rule-chip{font-size:12px;font-weight:950;border-radius:999px;padding:7px 10px;background:#fef3c7;color:#92400e;border:1px solid rgba(245,158,11,.35)}
 
+
+.priority-rule{margin:12px 0 14px;padding:14px;border-radius:18px;background:linear-gradient(135deg,#7f1d1d,#dc2626);color:#fff8ed;box-shadow:0 10px 24px rgba(185,28,28,.25);border:1px solid rgba(255,248,237,.18)}
+.priority-rule b{display:block;font-size:17px;margin-bottom:4px}
+.priority-rule span{display:block;font-size:13px;line-height:1.55;color:rgba(255,248,237,.88);font-weight:850}
+.rule-step.priority-step{border:2px solid #dc2626;background:#fff1f2;box-shadow:0 0 0 3px rgba(220,38,38,.08)}
+.rule-step.priority-step .rule-no{background:#dc2626}
+.rule-step.priority-step b{color:#7f1d1d}
+
 </style>
 </head>
 <body>
-<header><div class="wrap head"><div class="brand"><h1>おごりの鬼</h1><span>オンラインルーム版｜一覧参加方式</span></div><div class="pill" id="statusPill">未接続</div></div></header>
+<header><div class="wrap head"><div class="brand"><h1>おごりの鬼</h1><span>みんなで遊ぶおごり決定ゲーム</span></div><div class="pill" id="statusPill">未接続</div></div></header>
 <main class="wrap">
   <section id="setupScreen" class="screen active">
-    <div class="hero"><h2>オンラインで遊ぶ</h2><p>ホストはルームを作成。参加者は一覧からルーム名をタップして参加します。</p><p>同じ端末でテストする場合は、通常タブとシークレットタブ、または別ブラウザを使うと確実です。</p></div>
+    <div class="hero"><h2>オンラインで遊ぶ</h2><p>ホストはルームを作成。参加者は一覧からルーム名をタップして参加します。</p></div>
 
     <div class="panel rule-panel">
       <details class="rule-details">
         <summary>ルール・あそびかたを確認する</summary>
         <div class="rule-content">
           <p class="rule-lead">目的はシンプルです。最後に「今回のおごり番」を1人決めます。</p>
+          <div class="priority-rule"><b>最優先：鬼を1人だけ出したら即アウト</b><span>鬼カードを出した人が1人だけの場合、他にペアができていても、ルーレット抽選よりも先にその人がおごり番になります。鬼が2人出た場合は「鬼ペア」としてセーフです。</span></div>
           <div class="rule-chip-row">
             <span class="rule-chip">4人以上推奨</span>
             <span class="rule-chip">1人2枚配布</span>
             <span class="rule-chip">選ぶのは1枚</span>
+            <span class="rule-chip">鬼1人は即アウト</span>
             <span class="rule-chip">最後は公平ルーレット</span>
           </div>
           <div class="rule-steps">
@@ -32,11 +42,11 @@
             <div class="rule-step"><div class="rule-no">2</div><div><b>カードが2枚配られる</b><span>各プレイヤーに2枚ずつカードが配られます。鬼カードが同じ人に2枚行かないように調整されています。</span></div></div>
             <div class="rule-step"><div class="rule-no">3</div><div><b>出すカードを1枚選ぶ</b><span>2枚のうち、勝負に出すカードを1枚選びます。鬼以外のカードを選ぶ場合は、じゃんけんの手も選びます。</span></div></div>
             <div class="rule-step"><div class="rule-no">4</div><div><b>同じカードを出した人がペア成立</b><span>同じ名前のカードを出した人同士がペアになります。誰とも同じカードにならなかった人はセーフです。</span></div></div>
-            <div class="rule-step"><div class="rule-no">5</div><div><b>鬼ペアはセーフ</b><span>鬼カード同士でペアになった場合、その人たちはおごり抽選の対象から外れます。鬼カードを選んだ場合、じゃんけんは不要です。</span></div></div>
-            <div class="rule-step"><div class="rule-no">6</div><div><b>最後はルーレットで決定</b><span>鬼ペアを除いた成立ペアの人だけが候補者になります。候補者全員の中から、等確率のルーレットでおごり番を1人決定します。</span></div></div>
+            <div class="rule-step priority-step"><div class="rule-no">5</div><div><b>鬼カードは最優先で判定</b><span>鬼を1人だけ出した場合は即アウトです。鬼が2人出た場合だけ「鬼ペア」となり、その人たちはセーフです。鬼カードを選んだ場合、じゃんけんは不要です。</span></div></div>
+            <div class="rule-step"><div class="rule-no">6</div><div><b>鬼の一人出しがなければルーレット</b><span>鬼の一人出しがいない場合だけ、鬼ペアを除いた成立ペアの人が候補者になります。候補者全員の中から、等確率ルーレットでおごり番を1人決定します。</span></div></div>
           </div>
           <div class="rule-important">
-            <div class="notice ok">ペアにならなかった人はセーフです。</div>
+            <div class="notice error">鬼を1人だけ出した場合は、他の判定よりも優先して即アウトです。</div>
             <div class="notice ok">鬼ペアもセーフです。</div>
             <div class="notice">おごり候補者がいない場合は、全員セーフで「おごりなし」です。</div>
           </div>
@@ -54,7 +64,7 @@
       <div class="row">
         <button class="main" id="createRoomBtn">ルームを作る</button>
         <button class="ghost" id="refreshRoomsBtn">一覧を更新</button>
-        <button class="danger" id="cleanupRoomsBtn">古いルームを整理</button>
+        
       </div>
     </div>
 
@@ -74,10 +84,12 @@
         <summary>開始前にルールを確認する</summary>
         <div class="rule-content">
           <p class="rule-lead">目的はシンプルです。最後に「今回のおごり番」を1人決めます。</p>
+          <div class="priority-rule"><b>最優先：鬼を1人だけ出したら即アウト</b><span>鬼カードを出した人が1人だけの場合、他にペアができていても、ルーレット抽選よりも先にその人がおごり番になります。鬼が2人出た場合は「鬼ペア」としてセーフです。</span></div>
           <div class="rule-chip-row">
             <span class="rule-chip">4人以上推奨</span>
             <span class="rule-chip">1人2枚配布</span>
             <span class="rule-chip">選ぶのは1枚</span>
+            <span class="rule-chip">鬼1人は即アウト</span>
             <span class="rule-chip">最後は公平ルーレット</span>
           </div>
           <div class="rule-steps">
@@ -85,11 +97,11 @@
             <div class="rule-step"><div class="rule-no">2</div><div><b>カードが2枚配られる</b><span>各プレイヤーに2枚ずつカードが配られます。鬼カードが同じ人に2枚行かないように調整されています。</span></div></div>
             <div class="rule-step"><div class="rule-no">3</div><div><b>出すカードを1枚選ぶ</b><span>2枚のうち、勝負に出すカードを1枚選びます。鬼以外のカードを選ぶ場合は、じゃんけんの手も選びます。</span></div></div>
             <div class="rule-step"><div class="rule-no">4</div><div><b>同じカードを出した人がペア成立</b><span>同じ名前のカードを出した人同士がペアになります。誰とも同じカードにならなかった人はセーフです。</span></div></div>
-            <div class="rule-step"><div class="rule-no">5</div><div><b>鬼ペアはセーフ</b><span>鬼カード同士でペアになった場合、その人たちはおごり抽選の対象から外れます。鬼カードを選んだ場合、じゃんけんは不要です。</span></div></div>
-            <div class="rule-step"><div class="rule-no">6</div><div><b>最後はルーレットで決定</b><span>鬼ペアを除いた成立ペアの人だけが候補者になります。候補者全員の中から、等確率のルーレットでおごり番を1人決定します。</span></div></div>
+            <div class="rule-step priority-step"><div class="rule-no">5</div><div><b>鬼カードは最優先で判定</b><span>鬼を1人だけ出した場合は即アウトです。鬼が2人出た場合だけ「鬼ペア」となり、その人たちはセーフです。鬼カードを選んだ場合、じゃんけんは不要です。</span></div></div>
+            <div class="rule-step"><div class="rule-no">6</div><div><b>鬼の一人出しがなければルーレット</b><span>鬼の一人出しがいない場合だけ、鬼ペアを除いた成立ペアの人が候補者になります。候補者全員の中から、等確率ルーレットでおごり番を1人決定します。</span></div></div>
           </div>
           <div class="rule-important">
-            <div class="notice ok">ペアにならなかった人はセーフです。</div>
+            <div class="notice error">鬼を1人だけ出した場合は、他の判定よりも優先して即アウトです。</div>
             <div class="notice ok">鬼ペアもセーフです。</div>
             <div class="notice">おごり候補者がいない場合は、全員セーフで「おごりなし」です。</div>
           </div>
@@ -108,13 +120,6 @@
     </div>
 
     <div class="panel hidden" id="guestPanel"><h3>待機中</h3><p>ホストがゲームを開始するまで待ってください。</p></div>
-
-    <div class="panel" id="adminPanel">
-      <h3>管理操作</h3>
-      <p>ルームが残ってしまった場合は、マスターコードで強制削除できます。</p>
-      <label for="masterCodeInput">マスターコード</label>
-      <input id="masterCodeInput" type="password" inputmode="numeric" placeholder="0000">
-      <div class="row"><button class="danger" id="forceDeleteRoomBtn">このルームを強制削除</button></div>
     </div>
 
     <div class="row"><button class="ghost" id="leaveRoomBtn">退出</button></div>
@@ -196,6 +201,7 @@ const clientId = sessionStorage.getItem('ogoriClientId') || ('client_' + Date.no
 sessionStorage.setItem('ogoriClientId', clientId);
 
 const $ = id => document.getElementById(id);
+const on = (id, event, handler) => { const el=$(id); if(el) el.addEventListener(event, handler); };
 const show = name => ['setupScreen','roomScreen','playScreen','onlineResultScreen','lockedScreen'].forEach(id => $(id).classList.toggle('active', id === name));
 const msg = (id, text, type='notice') => { $(id).innerHTML = text ? `<div class="notice ${type}">${text}</div>` : ''; };
 const getPlayerName = () => $('playerName').value.trim();
@@ -286,12 +292,12 @@ function listenOpenRooms(){
     `).join('') : '<p>現在、参加できるルームはありません。</p>';
     document.querySelectorAll('[data-join-room]').forEach(btn => btn.onclick = () => joinRoom(btn.dataset.joinRoom));
     msg('setupMessage','');
-  }, e => msg('setupMessage','ルーム一覧取得エラー：'+escapeHtml(e.message),'error'));
+  }, e => msg('setupMessage','ルーム一覧を取得できません：'+escapeHtml(e.message),'error'));
 }
 
 async function createRoom(){
   if(!requirePlayerName()) return;
-  if(!uid) return msg('setupMessage','Firebase接続中です。少し待ってから再度お試しください。','error');
+  if(!uid) return msg('setupMessage','接続中です。少し待ってから再度お試しください。','error');
   const roomId = makeRoomId();
   const roomName = safeRoomName();
   await setDoc(doc(db,'rooms',roomId),{
@@ -316,7 +322,7 @@ async function createRoom(){
 
 async function joinRoom(roomId){
   if(!requirePlayerName()) return;
-  if(!uid) return msg('setupMessage','Firebase接続中です。少し待ってから再度お試しください。','error');
+  if(!uid) return msg('setupMessage','接続中です。少し待ってから再度お試しください。','error');
   const roomRef = doc(db,'rooms',roomId);
   const snap = await getDoc(roomRef);
   if(!snap.exists()) return msg('setupMessage','ルームが見つかりません。','error');
@@ -455,7 +461,7 @@ function renderOnlinePlay(){
   if(!selectedCardId){
     $('myHandsArea').innerHTML = '<label>じゃんけんの手</label><div class="notice">カードを選択すると、じゃんけんが必要かどうかを判定します。</div>';
   }else if(isOniSelected){
-    $('myHandsArea').innerHTML = '<label>じゃんけんの手</label><div class="notice ok">鬼カードを選択した場合、鬼ペアはセーフ扱いのため、じゃんけん選択は不要です。</div>';
+    $('myHandsArea').innerHTML = '<label>じゃんけんの手</label><div class="notice ok">鬼カードはじゃんけん選択不要です。鬼を1人だけ出した場合は即アウト、鬼ペアならセーフです。</div>';
   }else{
     $('myHandsArea').innerHTML = '<label>じゃんけんの手を選択</label><div class="row">'+hands.map(h=>`<button class="ghost hand-btn ${selectedHand===h.key?'selected':''}" data-my-hand="${h.key}" ${me.locked?'disabled':''}>${h.emoji} ${h.label}</button>`).join('')+'</div>';
   }
@@ -532,54 +538,79 @@ async function hostReveal(){
   const selected=players.map(p=>({
     clientId:p.clientId,
     name:p.name,
-    selectedHand:p.selectedHand || null,
+    selectedHand:p.selectedHand,
     selectedCard:(p.handCards||[]).find(c=>c.id===p.selectedCardId)
   }));
 
-  if(selected.some(p=>!p.selectedCard)){
-    alert('未選択のカードがあります。各端末のロック状況を確認してください。');
-    return;
-  }
-  if(selected.some(p=>p.selectedCard.name!=='鬼' && !p.selectedHand)){
-    alert('鬼以外のカードで、じゃんけん未選択の人がいます。');
-    return;
-  }
-
   const groups=groupByValue(selected,p=>p.selectedCard?.name||'未選択');
   const pairGroups=Object.values(groups).filter(g=>g.length>=2);
-  const oniPairGroups=pairGroups.filter(g=>g[0].selectedCard?.name==='鬼');
-  const eligiblePairGroups=pairGroups.filter(g=>g[0].selectedCard?.name!=='鬼');
+  const oniPlayers=selected.filter(p=>p.selectedCard?.name==='鬼');
+  const singleOniPlayers=oniPlayers.length===1 ? oniPlayers : [];
+  const hasPriorityOniLoser=singleOniPlayers.length===1;
 
-  const singleSafePlayers=selected
-    .filter(p=>(groups[p.selectedCard?.name||'未選択']||[]).length===1)
-    .map(p=>({name:p.name,reason:'ペア不成立'}));
-
-  const oniSafePlayers=oniPairGroups.flatMap(g=>g.map(p=>({name:p.name,reason:'鬼ペア'})));
-  const safePlayers=[...singleSafePlayers,...oniSafePlayers];
-
-  const candidatePlayers=eligiblePairGroups.flatMap(g=>g.map(p=>({
-    clientId:p.clientId,
-    name:p.name,
-    cardName:g[0].selectedCard.name,
-    hand:p.selectedHand || null
-  })));
-
+  let safePlayers=[];
+  let candidatePlayers=[];
   let winner=null;
   let winnerIndex=null;
-  if(candidatePlayers.length){
-    winnerIndex=randomIndex(candidatePlayers.length);
-    winner=candidatePlayers[winnerIndex];
+  let resultMode='roulette';
+
+  if(hasPriorityOniLoser){
+    resultMode='priorityOni';
+    winner=singleOniPlayers[0];
+    winnerIndex=0;
+    candidatePlayers=[{
+      clientId:winner.clientId,
+      name:winner.name,
+      cardName:'鬼',
+      hand:null,
+      priority:true
+    }];
+
+    safePlayers=selected
+      .filter(p=>p.clientId!==winner.clientId)
+      .map(p=>({
+        name:p.name,
+        reason:'鬼の一人出しが最優先で負け'
+      }));
+  }else{
+    const eligiblePairGroups=pairGroups.filter(g=>g[0].selectedCard.name!=='鬼');
+    const singlePlayers=selected
+      .filter(p=>(groups[p.selectedCard?.name||'未選択']||[]).length===1)
+      .map(p=>({
+        name:p.name,
+        reason:'ペア不成立'
+      }));
+
+    const oniPairSafe=pairGroups
+      .filter(g=>g[0].selectedCard.name==='鬼')
+      .flatMap(g=>g.map(p=>({name:p.name,reason:'鬼ペアのためセーフ'})));
+
+    safePlayers=[...singlePlayers,...oniPairSafe];
+
+    candidatePlayers=eligiblePairGroups.flatMap(g=>g.map(p=>({
+      clientId:p.clientId,
+      name:p.name,
+      cardName:g[0].selectedCard.name,
+      hand:p.selectedHand || null
+    })));
+
+    if(candidatePlayers.length){
+      winnerIndex=randomIndex(candidatePlayers.length);
+      winner=candidatePlayers[winnerIndex];
+    }
   }
 
   const result={
-    mode:'roulette',
+    mode:resultMode,
     generatedAt:Date.now(),
     pairGroups:pairGroups.map(g=>({
       cardName:g[0].selectedCard.name,
       type:g[0].selectedCard.type,
       players:g.map(p=>p.name),
-      eligible:g[0].selectedCard.name!=='鬼',
-      reason:g[0].selectedCard.name==='鬼'?'鬼ペアのためセーフ':'おごり抽選対象'
+      eligible:!hasPriorityOniLoser && g[0].selectedCard.name!=='鬼',
+      reason:hasPriorityOniLoser
+        ? '鬼の一人出しが最優先で負け'
+        : (g[0].selectedCard.name==='鬼'?'鬼ペアのためセーフ':'おごり抽選対象')
     })),
     safePlayers,
     candidatePlayers,
@@ -587,9 +618,12 @@ async function hostReveal(){
     winnerName:winner?.name || null,
     winnerClientId:winner?.clientId || null,
     winnerCardName:winner?.cardName || null,
-    note:winner
-      ? `鬼ペアを除いた${candidatePlayers.length}名の候補から等確率で抽選しました。`
-      : '鬼ペアを除き、おごり抽選対象のペアが成立しなかったため全員セーフです。'
+    priorityReason:hasPriorityOniLoser ? '鬼カード一人出し' : null,
+    note:hasPriorityOniLoser
+      ? '鬼カードを1人だけ出したため、他の判定より優先しておごり番が決定しました。'
+      : (winner
+        ? `鬼の一人出しがなかったため、鬼ペアを除いた${candidatePlayers.length}名の候補から等確率で抽選しました。`
+        : '鬼の一人出しがなく、鬼ペアを除き、おごり抽選対象のペアも成立しなかったため全員セーフです。')
   };
 
   await updateDoc(doc(db,'rooms',currentRoomId),{
@@ -609,8 +643,13 @@ function getWinnerIndexFromResult(result){
 }
 function buildRouletteLegendHtml(result){
   const candidates=result?.candidatePlayers || [];
+  return `<div class="roulette-legend">${candidates.map((c,i)=>`<div class="roulette-legend-item" data-roulette-index="${i}"><div class="roulette-legend-main"><span class="roulette-color-dot" style="background:${colorForIndex(i)}"></span><div><div class="roulette-legend-name">${escapeHtml(c.name)}</div><div class="roulette-legend-sub">対象カード：${escapeHtml(c.cardName || '')}</div></div></div><span class="badge gold hidden" data-winner-badge="${i}">当選</span></div>`).join('')}</div>`;
+}
+function revealRouletteWinnerBadge(result){
   const winnerIndex=getWinnerIndexFromResult(result);
-  return `<div class="roulette-legend">${candidates.map((c,i)=>`<div class="roulette-legend-item"><div class="roulette-legend-main"><span class="roulette-color-dot" style="background:${colorForIndex(i)}"></span><div><div class="roulette-legend-name">${escapeHtml(c.name)}</div><div class="roulette-legend-sub">対象カード：${escapeHtml(c.cardName || '')}</div></div></div>${i===winnerIndex?'<span class="badge gold">当選</span>':''}</div>`).join('')}</div>`;
+  document.querySelectorAll('[data-winner-badge]').forEach(el=>{
+    el.classList.toggle('hidden', Number(el.dataset.winnerBadge)!==winnerIndex);
+  });
 }
 function drawRouletteWheel(canvas,result,rotation=0){
   const candidates=result?.candidatePlayers || [];
@@ -724,6 +763,7 @@ function startRouletteAnimation(result,key){
       rouletteFinished=true;
       $('onlineWinnerTitle').textContent='おごりの鬼 決定';
       drawRouletteWheel(canvas,result,aligned);
+      revealRouletteWinnerBadge(result);
       if(finalBox) finalBox.classList.remove('hidden');
     }
   }
@@ -738,7 +778,22 @@ function renderOnlineResult(){
   const key=makeResultKey(result);
   const candidateCount=(result.candidatePlayers||[]).length;
 
-  if(result.winnerName){
+  if(result.mode==='priorityOni' && result.winnerName){
+    rouletteRenderKey=key;
+    rouletteStarted=false;
+    rouletteFinished=true;
+    $('onlineWinnerTitle').textContent='鬼の一人出し｜おごりの鬼 決定';
+    $('onlineResultBox').innerHTML=`
+      <div class="badge-row">
+        <span class="badge danger">最優先負け</span>
+        <span class="badge gold">鬼カード一人出し</span>
+      </div>
+      <div class="roulette-final">
+        <p>今回のおごり番</p>
+        <b>${escapeHtml(result.winnerName)}</b>
+        <p>${escapeHtml(result.note||'')}</p>
+      </div>`;
+  }else if(result.winnerName){
     $('onlineWinnerTitle').textContent=rouletteFinished?'おごりの鬼 決定':'公平ルーレット抽選中';
     if(rouletteRenderKey!==key){
       rouletteRenderKey=key;
@@ -783,9 +838,10 @@ function renderOnlineResult(){
   const candidates=(result.candidatePlayers||[]).map(p=>`<div class="player"><b>${escapeHtml(p.name)}</b><span class="tag host">${escapeHtml(p.cardName||'')}</span></div>`).join('');
   const safe=(result.safePlayers||[]).map(p=>`<div class="player"><b>${escapeHtml(p.name)}</b><span class="tag">セーフ｜${escapeHtml(p.reason||'')}</span></div>`).join('');
 
+  const candidateTitle=result.mode==='priorityOni'?'最優先負け対象':'ルーレット候補';
   $('onlineResultList').innerHTML=
     (pairs?`<h3>ペア成立</h3>${pairs}`:'<p>成立ペアはありません。</p>')+
-    (candidates?`<h3>ルーレット候補</h3>${candidates}`:'')+
+    (candidates?`<h3>${candidateTitle}</h3>${candidates}`:'')+
     (safe?`<h3>セーフ</h3>${safe}`:'');
 }
 
@@ -855,20 +911,18 @@ async function leaveRoom(){
   show('setupScreen');
 }
 
-$('createRoomBtn').onclick = createRoom;
-$('refreshRoomsBtn').onclick = listenOpenRooms;
-$('cleanupRoomsBtn').onclick = cleanupOldRooms;
-$('startRoomBtn').onclick = startRoom;
-$('abortRoomBtn').onclick = abortRoom;
-$('lockChoiceBtn').onclick = lockChoice;
-$('hostRevealBtn').onclick = hostReveal;
-$('onlineBackRoomBtn').onclick = () => show('roomScreen');
-$('nextRoundBtn').onclick = nextRound;
-$('forceDeleteRoomBtn').onclick = forceDeleteRoom;
-$('leaveRoomBtn').onclick = leaveRoom;
-$('backHomeBtn').onclick = () => show('setupScreen');
+on('createRoomBtn','click',createRoom);
+on('refreshRoomsBtn','click',listenOpenRooms);
+on('startRoomBtn','click',startRoom);
+on('abortRoomBtn','click',abortRoom);
+on('lockChoiceBtn','click',lockChoice);
+on('hostRevealBtn','click',hostReveal);
+on('onlineBackRoomBtn','click',() => show('roomScreen'));
+on('nextRoundBtn','click',nextRound);
+on('leaveRoomBtn','click',leaveRoom);
+on('backHomeBtn','click',() => show('setupScreen'));
 
-initFirebase().catch(e => msg('setupMessage','Firebase初期化エラー：'+escapeHtml(e.message),'error'));
+initFirebase().catch(e => msg('setupMessage','接続エラー：'+escapeHtml(e.message),'error'));
 </script>
 </body>
 </html>

@@ -73,6 +73,17 @@
       <p>待機中のルームだけが表示されます。参加したいルーム名をタップしてください。</p>
       <div id="roomList" class="room-list"></div>
     </div>
+
+    <div class="panel">
+      <h3>管理用：ルーム強制削除</h3>
+      <p>ルームが残ってしまった場合、マスターコードを入力して全ルームを強制削除できます。</p>
+      <label for="cleanupMasterCodeInput">マスターコード</label>
+      <input id="cleanupMasterCodeInput" type="password" inputmode="numeric" placeholder="0000">
+      <div class="row">
+        <button class="danger" id="forceCleanupOldRoomsBtn">ルームを強制削除</button>
+      </div>
+      <p class="small-note">※現在表示されているルーム、進行中のルームを含め、削除済み以外のルームをまとめて削除します。</p>
+    </div>
     <div id="setupMessage"></div>
   </section>
 
@@ -955,9 +966,54 @@ async function forceDeleteRoom(){
   await deleteCurrentRoom('マスターコードによりルームを強制削除しました。');
 }
 
-function cleanupOldRooms(){
-  msg('setupMessage','6時間以上前の待機ルームは自動的に一覧から非表示になります。不要な自分のルームは待機画面の「ルームを削除」またはマスターコードで消してください。','ok');
-  listenOpenRooms();
+async function forceDeleteAllRooms(){
+  if(!db || !uid){
+    msg('setupMessage','接続中です。少し待ってから再度お試しください。','error');
+    return;
+  }
+
+  const input=$('cleanupMasterCodeInput');
+  const code=input ? input.value.trim() : '';
+  if(code!==MASTER_CODE){
+    alert('マスターコードが違います');
+    if(input) input.focus();
+    return;
+  }
+
+  if(!confirm('削除済み以外の全ルームを強制削除します。現在進行中のルームも対象です。よろしいですか？')) return;
+
+  try{
+    const snap=await getDocs(collection(db,'rooms'));
+    const batch=writeBatch(db);
+    let count=0;
+
+    snap.forEach(d=>{
+      const room=d.data();
+      const alreadyDeleted=room.status==='deleted' || room.status==='aborted';
+
+      if(!alreadyDeleted){
+        batch.update(doc(db,'rooms',d.id),{
+          status:'deleted',
+          lockedJoin:true,
+          cleanedBy:'master',
+          updatedAt:serverTimestamp()
+        });
+        count++;
+      }
+    });
+
+    if(count===0){
+      msg('setupMessage','削除対象のルームはありませんでした。','ok');
+      return;
+    }
+
+    await batch.commit();
+    msg('setupMessage',`${count}件のルームを強制削除しました。`,'ok');
+    if(input) input.value='';
+    listenOpenRooms();
+  }catch(e){
+    msg('setupMessage','ルームの強制削除に失敗しました：'+escapeHtml(e.message),'error');
+  }
 }
 
 async function leaveRoom(){
@@ -985,6 +1041,7 @@ async function leaveRoom(){
 
 on('createRoomBtn','click',createRoom);
 on('refreshRoomsBtn','click',listenOpenRooms);
+on('forceCleanupOldRoomsBtn','click',forceDeleteAllRooms);
 on('startRoomBtn','click',startRoom);
 on('abortRoomBtn','click',abortRoom);
 on('lockChoiceBtn','click',lockChoice);

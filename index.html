@@ -82,7 +82,7 @@
       <div class="row">
         <button class="danger" id="forceCleanupOldRoomsBtn">ルームを強制削除</button>
       </div>
-      <p class="small-note">※現在表示されているルーム、進行中のルームを含め、削除済み以外のルームをまとめて削除します。</p>
+      <p class="small-note">※現在表示されているルーム、進行中のルームを含め、削除済み以外のルームをまとめて削除します。動作にはFirestoreルール側の許可が必要です。</p>
     </div>
     <div id="setupMessage"></div>
   </section>
@@ -152,7 +152,7 @@
     </div>
     <div class="panel hidden" id="hostRevealPanel">
       <h3>ホスト操作</h3>
-      <p>全員がロックしたら、結果公開へ進めます。</p>
+      <p>全員がロックすると、一斉公開できます。</p>
       <div class="row"><button class="main" id="hostRevealBtn">一斉公開</button></div>
     </div>
     <div id="playMessage"></div>
@@ -218,6 +218,11 @@ const msg = (id, text, type='notice') => { $(id).innerHTML = text ? `<div class=
 const getPlayerName = () => $('playerName').value.trim();
 const safeRoomName = () => $('roomNameInput').value.trim() || 'おごりの鬼ルーム';
 const makeRoomId = () => 'room_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
+const isCurrentHost = (room=currentRoomData) => !!(
+  localIsHost ||
+  (room && room.hostClientId && room.hostClientId === clientId) ||
+  (room && room.hostUid && uid && room.hostUid === uid)
+);
 const escapeHtml = value => String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('\"','&quot;').replaceAll("'",'&#039;');
 const tsushimaCardNames=['ヤマネコ','しいたけ','かすまき','白嶽','ブリ','キジ','ひらくち','シカ','イノシシ','対州そば','真珠'];
 const hands=[{key:'rock',label:'グー',emoji:'✊'},{key:'scissors',label:'チョキ',emoji:'✌'},{key:'paper',label:'パー',emoji:'🖐'}];
@@ -443,6 +448,7 @@ function listenRoom(roomId){
   roomUnsub = onSnapshot(doc(db,'rooms',roomId), snap => {
     if(!snap.exists()) return;
     const room = snap.data();
+    if(room.hostClientId === clientId || (uid && room.hostUid === uid)) localIsHost = true;
     $('roomNameDisplay').textContent = room.roomName || '名称未設定ルーム';
     if(room.status === 'waiting') $('statusPill').textContent = '待機中';
     if(room.status === 'selecting') {
@@ -482,7 +488,7 @@ function listenPlayers(roomId){
 }
 
 async function startRoom(){
-  if(!currentRoomId || !localIsHost) return;
+  if(!currentRoomId || !isCurrentHost()) return;
   const playersSnap = await getDocs(collection(db,'rooms',currentRoomId,'players'));
   const players = [];
   playersSnap.forEach(d => players.push(d.data()));
@@ -563,7 +569,11 @@ function renderOnlinePlay(){
   const lockedCount = currentPlayers.filter(p=>p.locked).length;
   $('lockStatusList').innerHTML = currentPlayers.map(p=>`<div class="player"><b>${escapeHtml(p.name)}</b><span class="tag ${p.locked?'host':''}">${p.locked?'ロック済み':'未選択'}</span></div>`).join('');
   const allLocked = currentPlayers.length > 0 && lockedCount === currentPlayers.length;
-  $('hostRevealPanel').classList.toggle('hidden',!(localIsHost && allLocked));
+  const hostNow = isCurrentHost();
+
+  $('hostRevealPanel').classList.toggle('hidden',!hostNow);
+  $('hostRevealBtn').disabled = !allLocked;
+  $('hostRevealBtn').textContent = allLocked ? '一斉公開' : `一斉公開（${lockedCount}/${currentPlayers.length} ロック）`;
 }
 
 async function lockChoice(){
@@ -609,7 +619,7 @@ function makeResultKey(result){
   return [currentRoomId || '', result?.generatedAt || '', result?.winnerClientId || 'none', result?.winnerName || ''].join('|');
 }
 async function hostReveal(){
-  if(!currentRoomId||!localIsHost)return;
+  if(!currentRoomId||!isCurrentHost())return;
   const playersSnap=await getDocs(collection(db,'rooms',currentRoomId,'players'));
   const players=[];
   playersSnap.forEach(d=>players.push(d.data()));
@@ -856,7 +866,7 @@ function renderOnlineResult(){
   const result=currentRoomData?.result;
   if(!result)return;
 
-  $('hostNextRoundPanel').classList.toggle('hidden',!localIsHost);
+  $('hostNextRoundPanel').classList.toggle('hidden',!isCurrentHost());
 
   const key=makeResultKey(result);
   const candidateCount=(result.candidatePlayers||[]).length;
@@ -929,7 +939,7 @@ function renderOnlineResult(){
 }
 
 async function nextRound(){
-  if(!currentRoomId || !localIsHost) return;
+  if(!currentRoomId || !isCurrentHost()) return;
   selectedCardId=null;
   selectedHand=null;
   rouletteRenderKey=null;
@@ -949,7 +959,7 @@ async function deleteCurrentRoom(message='ルームを削除しました。'){
 }
 
 async function abortRoom(){
-  if(!currentRoomId || !localIsHost) return;
+  if(!currentRoomId || !isCurrentHost()) return;
   await deleteCurrentRoom('ルームを一覧から削除しました。');
 }
 
@@ -1012,7 +1022,11 @@ async function forceDeleteAllRooms(){
     if(input) input.value='';
     listenOpenRooms();
   }catch(e){
-    msg('setupMessage','ルームの強制削除に失敗しました：'+escapeHtml(e.message),'error');
+    const detail=String(e?.message || e || '');
+    const hint=detail.toLowerCase().includes('permission')
+      ? '<br>Firestoreのルールで強制削除が許可されていない可能性があります。Firestore Database の「ルール」を確認してください。'
+      : '';
+    msg('setupMessage','ルームの強制削除に失敗しました：'+escapeHtml(detail)+hint,'error');
   }
 }
 

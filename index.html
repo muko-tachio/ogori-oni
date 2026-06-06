@@ -148,7 +148,7 @@
   </section>
 
   <section id="onlineResultScreen" class="screen">
-    <div class="hero"><h2>ルーレット結果発表</h2><p>成立ペアを確認し、鬼ペアを除いた候補者から公平なルーレットでおごり番を決定します。</p></div>
+    <div class="hero"><h2>結果発表</h2><p>選ばれたカードを確認し、ルールに沿って今回のおごり番を決定します。</p></div>
     <div class="panel">
       <h3 id="onlineWinnerTitle">結果</h3>
       <div id="onlineResultBox"></div>
@@ -224,29 +224,63 @@ function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.fl
 function rareSet(n){if(n<=5)return['キング'];if(n<=8)return['キング','クイーン'];if(n<=10)return['キング','クイーン','エンジェル'];return rareNames;}
 function makeDeck(n){const total=n*2,rares=rareSet(n),deck=[card('鬼','鬼'),card('鬼','鬼')];rares.forEach(name=>deck.push(card(name,'レア'),card(name,'レア')));const maxNames=Math.max(1,n-1),names=[{name:'鬼',type:'鬼'},...rares.map(name=>({name,type:'レア'}))];let i=0;while(names.length<maxNames){names.push({name:regularNames[i++%regularNames.length],type:'通常'});}const regs=names.filter(x=>x.type==='通常');i=0;while(deck.length<total){const e=regs[i++%regs.length];deck.push(card(e.name,e.type));}return shuffle(deck);}
 function dealHandsWithoutDoubleOni(playerCount){
-  for(let attempt=0; attempt<80; attempt++){
+  // 配布条件：
+  // 1人に配られる2枚は、鬼を含めて同じ名前にならない。
+  // 例：鬼＋鬼、キング＋キング、ブリ＋ブリは不可。
+  // これにより、配られた瞬間から選択肢が実質1択になる状態を避ける。
+  for(let attempt=0; attempt<200; attempt++){
     const deck=makeDeck(playerCount);
     const hands=[];
     let ok=true;
     for(let i=0;i<playerCount;i++){
       const pair=[deck[i*2],deck[i*2+1]];
-      if(pair[0].name==='鬼' && pair[1].name==='鬼'){ok=false;break;}
+      if(pair[0].name===pair[1].name){ok=false;break;}
       hands.push(pair);
     }
     if(ok) return hands;
   }
+
+  // 念のための安全策。
+  // ランダム再試行で条件を満たせなかった場合、1枚ずつ順番に置き、
+  // 同名カードが同じ手札に入らないように割り当てる。
   const deck=makeDeck(playerCount);
-  const oni=deck.filter(c=>c.name==='鬼');
-  const others=deck.filter(c=>c.name!=='鬼');
   const hands=Array.from({length:playerCount},()=>[]);
-  oni.forEach((c,i)=>hands[i].push(c));
-  let index=0;
-  for(const c of others){
-    while(hands[index%playerCount].length>=2) index++;
-    hands[index%playerCount].push(c);
-    index++;
+  const sorted=[...deck].sort((a,b)=>a.name.localeCompare(b.name,'ja'));
+
+  for(const c of sorted){
+    let placed=false;
+    for(let offset=0; offset<playerCount; offset++){
+      const index=(hands.reduce((minIndex,h,i)=>h.length<hands[minIndex].length?i:minIndex,0)+offset)%playerCount;
+      if(hands[index].length<2 && !hands[index].some(x=>x.name===c.name)){
+        hands[index].push(c);
+        placed=true;
+        break;
+      }
+    }
+    if(!placed){
+      const index=hands.findIndex(h=>h.length<2);
+      if(index>=0) hands[index].push(c);
+    }
   }
-  return hands.map(h=>h.length===2?h:[...h,others.pop()].slice(0,2));
+
+  // 最終チェック。万一同名2枚が発生した場合は再帰ではなく、再試行結果に戻す。
+  if(hands.every(h=>h.length===2 && h[0].name!==h[1].name)) return hands;
+
+  for(let attempt=0; attempt<200; attempt++){
+    const deck=makeDeck(playerCount);
+    const retryHands=[];
+    let ok=true;
+    for(let i=0;i<playerCount;i++){
+      const pair=[deck[i*2],deck[i*2+1]];
+      if(pair[0].name===pair[1].name){ok=false;break;}
+      retryHands.push(pair);
+    }
+    if(ok) return retryHands;
+  }
+
+  // ここまで来ることは通常ありませんが、ゲーム停止を避けるため最低限2枚ずつ返します。
+  const fallback=makeDeck(playerCount);
+  return Array.from({length:playerCount},(_,i)=>[fallback[i*2],fallback[i*2+1]]);
 }
 const roomAgeMs = room => room.createdAt?.toMillis ? Date.now() - room.createdAt.toMillis() : 0;
 const isVisibleWaitingRoom = room => room.status === 'waiting' && !room.lockedJoin && roomAgeMs(room) <= ROOM_VISIBLE_MS;

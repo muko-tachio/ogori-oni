@@ -28,14 +28,14 @@
       <details class="rule-details">
         <summary>ルール・あそびかたを確認する</summary>
         <div class="rule-content">
-          <p class="rule-lead">目的はシンプルです。最後に「今回のおごり番」を1人決めます。</p>
+          <p class="rule-lead">目的はシンプルです。最後に「今回のおごり番」を1人決めます。鬼カードだけが特別で、それ以外は対馬カードが人数に応じて2枚・3枚などで入ります。</p>
           <div class="priority-rule"><b>最優先：鬼を1人だけ出したら即アウト</b><span>鬼カードを出した人が1人だけの場合、他にペアができていても、ルーレット抽選よりも先にその人がおごり番になります。鬼が2人出た場合は「鬼ペア」としてセーフです。</span></div>
           <div class="rule-chip-row">
             <span class="rule-chip">4人以上推奨</span>
             <span class="rule-chip">1人2枚配布</span>
             <span class="rule-chip">選ぶのは1枚</span>
             <span class="rule-chip">鬼1人は即アウト</span>
-            <span class="rule-chip">最後は公平ルーレット</span>
+            <span class="rule-chip">対馬カードは枚数調整</span><span class="rule-chip">最後は公平ルーレット</span>
           </div>
           <div class="rule-steps">
             <div class="rule-step"><div class="rule-no">1</div><div><b>ルームに参加する</b><span>ホストがルームを作り、参加者は一覧からルーム名を選んで参加します。</span></div></div>
@@ -83,14 +83,14 @@
       <details class="rule-details">
         <summary>開始前にルールを確認する</summary>
         <div class="rule-content">
-          <p class="rule-lead">目的はシンプルです。最後に「今回のおごり番」を1人決めます。</p>
+          <p class="rule-lead">目的はシンプルです。最後に「今回のおごり番」を1人決めます。鬼カードだけが特別で、それ以外は対馬カードが人数に応じて2枚・3枚などで入ります。</p>
           <div class="priority-rule"><b>最優先：鬼を1人だけ出したら即アウト</b><span>鬼カードを出した人が1人だけの場合、他にペアができていても、ルーレット抽選よりも先にその人がおごり番になります。鬼が2人出た場合は「鬼ペア」としてセーフです。</span></div>
           <div class="rule-chip-row">
             <span class="rule-chip">4人以上推奨</span>
             <span class="rule-chip">1人2枚配布</span>
             <span class="rule-chip">選ぶのは1枚</span>
             <span class="rule-chip">鬼1人は即アウト</span>
-            <span class="rule-chip">最後は公平ルーレット</span>
+            <span class="rule-chip">対馬カードは枚数調整</span><span class="rule-chip">最後は公平ルーレット</span>
           </div>
           <div class="rule-steps">
             <div class="rule-step"><div class="rule-no">1</div><div><b>ルームに参加する</b><span>ホストがルームを作り、参加者は一覧からルーム名を選んで参加します。</span></div></div>
@@ -208,10 +208,9 @@ const getPlayerName = () => $('playerName').value.trim();
 const safeRoomName = () => $('roomNameInput').value.trim() || 'おごりの鬼ルーム';
 const makeRoomId = () => 'room_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
 const escapeHtml = value => String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('\"','&quot;').replaceAll("'",'&#039;');
-const regularNames=['ブリ','キジ','ヤマネコ','ひらくち','カッパ','シカ','イノシシ','トビウオ'];
-const rareNames=['キング','クイーン','エンジェル','デビル'];
+const tsushimaCardNames=['ヤマネコ','しいたけ','かすまき','白嶽','ブリ','キジ','ひらくち','カッパ','シカ','イノシシ','トビウオ','アオサ','対州そば','真珠'];
 const hands=[{key:'rock',label:'グー',emoji:'✊'},{key:'scissors',label:'チョキ',emoji:'✌'},{key:'paper',label:'パー',emoji:'🖐'}];
-const cardIcons={'鬼':'👹','キング':'👑','クイーン':'💎','エンジェル':'🪽','デビル':'😈','ブリ':'🐟','キジ':'🐦','ヤマネコ':'🐆','ひらくち':'🐍','カッパ':'🥒','シカ':'🦌','イノシシ':'🐗','トビウオ':'🐟'};
+const cardIcons={'鬼':'👹','ヤマネコ':'🐆','しいたけ':'🍄','かすまき':'🍡','白嶽':'⛰️','ブリ':'🐟','キジ':'🐦','ひらくち':'🐍','カッパ':'🥒','シカ':'🦌','イノシシ':'🐗','トビウオ':'🐟','アオサ':'🌿','対州そば':'🍜','真珠':'🦪'};
 let currentRoomData=null;
 let currentPlayers=[];
 let selectedCardId=null;
@@ -221,12 +220,51 @@ let rouletteStarted=false;
 let rouletteFinished=false;
 function card(name,type){return{id:name+'-'+type+'-'+Math.random().toString(36).slice(2),name,type};}
 function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
-function rareSet(n){if(n<=5)return['キング'];if(n<=8)return['キング','クイーン'];if(n<=10)return['キング','クイーン','エンジェル'];return rareNames;}
-function makeDeck(n){const total=n*2,rares=rareSet(n),deck=[card('鬼','鬼'),card('鬼','鬼')];rares.forEach(name=>deck.push(card(name,'レア'),card(name,'レア')));const maxNames=Math.max(1,n-1),names=[{name:'鬼',type:'鬼'},...rares.map(name=>({name,type:'レア'}))];let i=0;while(names.length<maxNames){names.push({name:regularNames[i++%regularNames.length],type:'通常'});}const regs=names.filter(x=>x.type==='通常');i=0;while(deck.length<total){const e=regs[i++%regs.length];deck.push(card(e.name,e.type));}return shuffle(deck);}
+function buildTsushimaCardCounts(playerCount){
+  // 鬼以外のカード構成を人数に応じて自動調整する。
+  // 目的：
+  // ・カード種類が多すぎて「おごりなし」になりやすい状態を避ける。
+  // ・同時に、人数が増えたら使用する対馬カードの種類も増やす。
+  // 基本は各カード2〜3枚。人数が非常に多い場合のみ4枚以上になる可能性があります。
+  const localTotal=playerCount*2-2; // 鬼2枚を除いた枚数
+  const idealTypeCount=Math.max(2, Math.ceil(localTotal/3));
+  const typeCount=Math.min(tsushimaCardNames.length, idealTypeCount);
+  const names=shuffle(tsushimaCardNames).slice(0,typeCount);
+
+  const counts=Object.fromEntries(names.map(name=>[name,2]));
+  let remaining=localTotal - typeCount*2;
+  let index=0;
+
+  while(remaining>0){
+    const name=names[index % names.length];
+    counts[name]++;
+    remaining--;
+    index++;
+  }
+
+  return names.map(name=>({name,count:counts[name]}));
+}
+function makeDeck(n){
+  // 基本構成：
+  // ・鬼カードは2枚だけ。
+  // ・鬼以外は対馬カード。
+  // ・対馬カードの種類数と枚数は、プレイヤー数に応じて毎ゲーム自動調整。
+  //   例：4人なら2種類×3枚、6人なら4種類で3枚/2枚混在、8人なら5種類で3枚/2枚混在。
+  const deck=[card('鬼','鬼'),card('鬼','鬼')];
+  const localCounts=buildTsushimaCardCounts(n);
+
+  localCounts.forEach(entry=>{
+    for(let i=0;i<entry.count;i++){
+      deck.push(card(entry.name,'対馬'));
+    }
+  });
+
+  return shuffle(deck);
+}
 function dealHandsWithoutDoubleOni(playerCount){
   // 配布条件：
   // 1人に配られる2枚は、鬼を含めて同じ名前にならない。
-  // 例：鬼＋鬼、キング＋キング、ブリ＋ブリは不可。
+  // 例：鬼＋鬼、ヤマネコ＋ヤマネコ、しいたけ＋しいたけは不可。
   // これにより、配られた瞬間から選択肢が実質1択になる状態を避ける。
   for(let attempt=0; attempt<200; attempt++){
     const deck=makeDeck(playerCount);
@@ -490,7 +528,7 @@ function renderOnlinePlay(){
   if(isOniSelected) selectedHand = null;
   const needHand = !!selectedCardId && !isOniSelected;
 
-  $('myCardsArea').innerHTML = '<label>カードを1枚選択</label><div class="room-list">'+me.handCards.map(c=>`<button class="room-card ${selectedCardId===c.id?'selected':''}" data-my-card="${c.id}" ${me.locked?'disabled':''}><b>${cardIcons[c.name]||'🎴'} ${escapeHtml(c.name)}</b><span>${escapeHtml(c.type)}カード</span></button>`).join('')+'</div>';
+  $('myCardsArea').innerHTML = '<label>カードを1枚選択</label><div class="room-list">'+me.handCards.map(c=>`<button class="room-card ${selectedCardId===c.id?'selected':''}" data-my-card="${c.id}" ${me.locked?'disabled':''}><b>${cardIcons[c.name]||'🎴'} ${escapeHtml(c.name)}</b><span>${c.name==="鬼"?"特別カード":"対馬カード"}</span></button>`).join('')+'</div>';
 
   if(!selectedCardId){
     $('myHandsArea').innerHTML = '<label>じゃんけんの手</label><div class="notice">カードを選択すると、じゃんけんが必要かどうかを判定します。</div>';
